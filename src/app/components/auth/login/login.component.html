@@ -1,58 +1,57 @@
 <div class="container">
-
-    <!-- Outer Row -->
-    <div class="row justify-content-center">
-
-        <div class="col-xl-10 col-lg-12 col-md-9">
-
-            <div class="card o-hidden border-0 shadow-lg my-5">
-                <div class="card-body p-0">
-                    <!-- Nested Row within Card Body -->
-                    <div class="row">
-                        <div class="col-lg-6 d-none d-lg-block bg-login-image"></div>
-                        <div class="col-lg-6">
-                            <div class="p-5">
-                                <div class="text-center">
-                                    <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
-                                </div>
-                                <form class="user">
-                                    <div class="form-group">
-                                        <input type="email" [(ngModel)]="email" [ngModelOptions]="{standalone: true}" class="form-control" id="email"  placeholder="Enter Email">
-                                    </div>
-                                    <div class="form-group">
-                                        <input type="motDePasse" [(ngModel)]="motDePasse" [ngModelOptions]="{standalone: true}" class="form-control" id="motDePasse" class="form-control" placeholder="Enter Password">
-                                    </div>
-                                     <div *ngIf="errorMessage" class="error-message">
-      {{ errorMessage }}
-    </div>
-                                    <div class="form-group">
-                                        <div class="custom-control custom-checkbox small">
-                                            <input type="checkbox" class="custom-control-input" id="customCheck">
-                                            <label class="custom-control-label" for="customCheck">Remember
-                                                Me</label>
-                                        </div>
-                                    </div>
-                                    
-                                    <button class="btn btn-primary btn-user btn-block" type="button" (click)="login()">
-                                        Login
-                                    </button>
-                                    <hr>
-                                </form>
-                                <hr>
-                                <div class="text-center">
-                                    <a class="small" href="forgotpassword">Forgot Password?</a>
-                                </div>
-                                <div class="text-center">
-                                    <a class="small" href="register">Create an Account!</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+  <!-- Outer Row -->
+  <div class="row justify-content-center">
+    <div class="col-xl-10 col-lg-12 col-md-9">
+      <div class="card o-hidden border-0 shadow-lg my-5">
+        <div class="card-body p-0">
+          <!-- Nested Row within Card Body -->
+          <div class="row">
+            <div class="col-lg-6">
+              <img src="assets/img/Telnet.png" alt="Telnet Logo" class="mb-4" style="width: 400px; height: auto;">
             </div>
-
+            <div class="col-lg-6 mx-auto">
+              <div class="p-5">
+                <div class="text-center">
+                  <h1 class="h4 text-gray-900 mb-4" style="color: dodgerblue !important">Welcome Back!</h1>
+                </div>
+                <form [formGroup]="Form" (ngSubmit)="login()">
+                  <div class="form-group">
+                    <input type="email" formControlName="email" class="form-control" id="email" placeholder="Enter Email" required>
+                    <div *ngIf="Form.get('email')?.invalid && Form.get('email')?.touched" class="text-danger">
+                      <div *ngIf="Form.get('email')?.errors?.['required']">Email is required</div>
+                      <div *ngIf="Form.get('email')?.errors?.['email']">Email is not valid</div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <input type="password" formControlName="password" class="form-control" id="motDePasse" placeholder="Enter Password" required>
+                    <div *ngIf="Form.get('password')?.invalid && Form.get('password')?.touched" class="text-danger">
+                      <div *ngIf="Form.get('password')?.errors?.['required']">Password is required</div>
+                    </div>
+                  </div>
+                  <div *ngIf="errorMessage" class="error-message text-danger">
+                    {{ errorMessage }}
+                  </div>
+                  <div class="form-group">
+                    <div class="custom-control custom-checkbox small">
+                      <input type="checkbox" class="custom-control-input" id="customCheck">
+                      <label class="custom-control-label" for="customCheck">Remember Me</label>
+                    </div>
+                  </div>
+                  <button class="btn btn-primary btn-user btn-block" type="submit">Login</button>
+                  <hr>
+                </form>
+                <hr>
+                <div class="text-center">
+                  <a class="small" href="forgotpassword">Forgot Password?</a>
+                </div>
+                <div class="text-center">
+                  <a class="small" href="register">Create an Account!</a>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-
+      </div>
     </div>
-
+  </div>
 </div>

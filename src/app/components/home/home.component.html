@@ -1,3 +1,8 @@
+
+<style>
+.navbar-dropdown-item {
+    margin-right: 100px; /* Ajustez la valeur selon vos besoins */
+}</style>
 <div id="wrapper">
 
     <!-- Sidebar -->
@@ -8,17 +13,18 @@
             <div class="sidebar-brand-icon rotate-n-15">
                 <i class="fas fa-laugh-wink"></i>
             </div>
-            <div class="sidebar-brand-text mx-3">SB Admin <sup>2</sup></div>
+            <div class="sidebar-brand-text mx-3">Telnet</div>
         </a>
   
         <!-- Divider -->
         <hr class="sidebar-divider my-0">
   
-        <!-- Nav Item - Dashboard -->
         <li class="nav-item active">
             <a class="nav-link" href="index.html">
                 <i class="fas fa-fw fa-tachometer-alt"></i>
-                <span>Dashboard</span></a>
+               
+                <span >Dashboard</span>
+            </a>
         </li>
   
         <!-- Divider -->
@@ -303,9 +309,7 @@
                     <li class="nav-item dropdown no-arrow">
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">Douglas McGee</span>
-                            <img class="assets/img-profile rounded-circle"
-                                src="assets/img/undraw_profile.svg">
+                            <span class="navbar-dropdown-item d-none d-lg-inline text-gray-600 small">{{ loggedInUsername }}</span>
                         </a>
                         <!-- Dropdown - User Information -->
                         <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
@@ -338,12 +342,13 @@
             <!-- Begin Page Content -->
             <div class="container-fluid">
   
-                <!-- Page Heading -->
-                <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                    <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
-                    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-                            class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
-                </div>
+                <li class="nav-item active">
+                    <a class="nav-link" href="index.html">
+                        <i class="fas fa-fw fa-tachometer-alt"></i>
+                        
+                        <span >Dashboard</span>
+                    </a>
+                </li>
   
                 <!-- Content Row -->
                 <div class="row">

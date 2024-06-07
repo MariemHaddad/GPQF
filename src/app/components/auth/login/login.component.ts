@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as bcrypt from 'bcryptjs';
 import { AuthService } from 'src/app/services/auth.service';
@@ -9,42 +10,58 @@ import { CryptoService } from 'src/app/services/crypto.service';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent {
-  
-  email: string = '';
-  motDePasse: string = '';
+export class LoginComponent implements OnInit {Form: FormGroup;
   errorMessage: string = '';
+  message: string = '';
 
-  constructor(private authService: AuthService, private router: Router, private http: HttpClient) { }
+  constructor(private authService: AuthService, private router: Router, private fb: FormBuilder) {
+    this.Form = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required]]
+    });
+  }
+
+  ngOnInit(): void {}
+
   login() {
-    // Données à envoyer dans la requête POST
-    const bodyData = {
-      email: this.email,
-      motDePasse: this.motDePasse
-    };
+    if (this.Form.invalid) {
+      console.log('Form is invalid');
+      this.displayValidationErrors();
+      return;
+    }
 
-    // Envoi de la requête POST pour l'authentification
-    this.http.post("http://localhost:8080/api/user/authenticate", bodyData, { responseType: 'text' }).subscribe(
-      (response: any) => {
-        // Authentification réussie
-        console.log(response); // Afficher la réponse dans la console
+    console.log('Form values:', this.Form.value);
 
-        if (response === 'Authentification réussie.') {
-          this.router.navigate(['/home']);
+    this.authService.authenticate(this.Form.value.email, this.Form.value.password).subscribe({
+      next: (data: { token: string; id: string; role: string }) => {
+        console.log('Login successful:', data);
+        this.authService.setToLocalStorage("token", data.token);
+        this.authService.setToLocalStorage("id", data.id);
+        this.authService.setToLocalStorage("role", data.role);
+
+        if (data.role === 'ADMIN') {
+          this.router.navigate(['/admin']);
         } else {
-          this.errorMessage = response;
+          this.router.navigate(['/home']);
         }
       },
-      error => {
-        // Erreur d'authentification
-        console.error(error); // Afficher l'erreur dans la console
-        
-        if (error.status === 401) {
-          this.errorMessage = "Email ou mot de passe incorrect.";
-        } else {
-          this.errorMessage = "Une erreur s'est produite lors de l'authentification.";
+      error: (err: { status: number }) => {
+        console.error('Login error:', err);
+        if (err.status === 401) {
+          this.message = 'Bad Credential';
         }
       }
-    );
+    });
+  }
+
+  displayValidationErrors() {
+    for (const key in this.Form.controls) {
+      if (this.Form.controls.hasOwnProperty(key)) {
+        const control = this.Form.controls[key];
+        if (control.invalid) {
+          console.error(`Validation error in ${key}:`, control.errors);
+        }
+      }
+    }
   }
 }

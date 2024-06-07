@@ -1,55 +1,59 @@
 <body class="bg-gradient-primary">
-    <div class="container custom-container">
-        <div class="card o-hidden border-0 shadow-lg my-5">
-            <div class="card-body p-5">
-                <div class="row justify-content-center">
-                    <div class="col-lg-7">
-                        <div class="p-5">
-                            <div class="text-center">
-                                <img src="assets/img/Telnet.png" alt="Telnet Logo" class="mb-4" style="width: 200px; height: auto;">
-                                <h1 class="h4 text-gray-900 mb-4">Create an Account!</h1>
-                            </div>
-                            <form>
-                                <div class="form-group row">
-                                    <div class="col-sm-6 mb-3 mb-sm-0">
-                                        <input type="text" [(ngModel)]="nom" [ngModelOptions]="{standalone: true}"  class="form-control" id="name" placeholder="Enter Name">
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <input type="text" [(ngModel)]="prenom" [ngModelOptions]="{standalone: true}"  class="form-control" id="prenom" placeholder="Prenom">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <input type="email" [(ngModel)]="email" [ngModelOptions]="{standalone: true}" class="form-control" id="email" placeholder="Enter Email">
-                                </div>
-                                <div class="form-group row">
-                                    <div class="col-sm-6 mb-3 mb-sm-0">
-                                        <input type="password" [(ngModel)]="motDePasse" [ngModelOptions]="{standalone: true}" class="form-control" id="motDePasse" placeholder="Enter Password">
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <input type="text" [(ngModel)]="role" [ngModelOptions]="{standalone: true}"  class="form-control" id="role" placeholder="Role">
-                                    </div>
-                                </div>
-                                <button class="btn btn-primary btn-user btn-block" type="button" (click)="createAccount()">Register Account</button>
-                                <hr>
-                            </form>
-                            <hr>
-                            <div class="text-center">
-                                <a class="small" href="forgot-password.html">Forgot Password?</a>
-                            </div>
-                            <div class="text-center">
-                                <a class="small" href="login.html">Already have an account? Login!</a>
-                            </div>
-                        </div>
-                    </div>
+  <div class="container custom-container">
+    <div class="card o-hidden border-0 shadow-lg my-5">
+      <div class="card-body p-5">
+        <div class="row justify-content-center">
+          <div class="col-lg-7">
+            <div class="p-5">
+              <div class="text-center">
+                <img src="assets/img/Telnet.png" alt="Telnet Logo" class="mb-4" style="width: 200px; height: auto;">
+              </div>
+              <form [formGroup]="registrationForm" (ngSubmit)="createaccount()">
+                <div class="form-group row">
+                  <div class="col-sm-6 mb-3 mb-sm-0">
+                    <input formControlName="nom" class="form-control" id="name" placeholder="Enter Name" required>
+                  </div>
+                  <div class="col-sm-6">
+                    <input formControlName="prenom" class="form-control" id="prenom" placeholder="Prenom" required>
+                  </div>
                 </div>
+                <div class="form-group">
+                  <input formControlName="email" class="form-control" id="email" placeholder="Enter Email" required>
+                </div>
+                <div class="form-group row">
+                  <div class="col-sm-6 mb-3 mb-sm-0">
+                    <input formControlName="password" type="password" class="form-control" id="motDePasse" placeholder="Enter Password" required>
+                  </div>
+                  <div class="col-sm-6">
+                    <select formControlName="role" class="form-control" id="role" required>
+                      <option value="" disabled selected>Select Role</option>
+                      <option value="ADMIN">Admin</option>
+                      <option value="DIRECTEUR">Directeur</option>
+                      <option value="CHEFDEPROJET">Chef de projet</option>
+                      <option value="RQUALITE">Responsable Qualité</option>
+                    </select>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-user btn-block">Register Account</button>
+                <hr>
+              </form>
+              <hr>
+              <div class="text-center">
+                <a class="small" href="forgotpassword">Forgot Password?</a>
+              </div>
+              <div class="text-center">
+                <a class="small" href="login">Already have an account? Login!</a>
+              </div>
             </div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 
-    <style>
-        /* Ajoutez ces styles CSS à la fin de votre fichier HTML ou dans votre fichier CSS externe */
-        .custom-container {
-            margin-top: -150px; /* Ajustez cette valeur selon vos besoins pour déplacer le contenu vers le haut */
-        }
-    </style>
+  <style>
+    .custom-container {
+      margin-top: -150px;
+    }
+  </style>
 </body>

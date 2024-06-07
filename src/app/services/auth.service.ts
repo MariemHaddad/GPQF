@@ -1,35 +1,68 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
-import * as bcrypt from 'bcryptjs';
+import { JwtHelperService } from '@auth0/angular-jwt';
+import { Observable, catchError, map, tap, throwError } from 'rxjs';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-
-  private apiUrl = 'http://localhost:8080/api/user'; // URL de votre API
-
-  constructor(private http: HttpClient,private router:Router) { }
+  private jwtHelper: JwtHelperService = new JwtHelperService();
+  private apiUrl = 'http://localhost:8080/api/authentication';
+  private tokenKey: string = 'token';
+  private loggedInUsername: string = '';
+  constructor(private http: HttpClient, private router: Router) { }
+  setLoggedInUsername(username: string) {
+    this.loggedInUsername = username;
+    console.log("Nom d'utilisateur stocké :", username);
+  }
+  getLoggedInUsername(): string {
+    return this.loggedInUsername;
+  }
 
  
-  createAccount(data:FormGroup):Observable<any>{
-    return this.http.post<any>("http://localhost:8080/api/user/registeruser",data);
+
+  createaccount(data: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/register`, data)
+    
   }
 
-  
-  authenticate(email: string, motDePasse: string): Observable<any> {
-    return this.http.post<any>("http://localhost:8080/api/user/authenticate", { email, motDePasse });
+  logout(): void {
+    localStorage.removeItem('token');
+    this.router.navigate(['/login']);
   }
-  private baseUrl = 'http://localhost:8080/api/user'; // Base URL de votre API
 
+ 
+  authenticate(email: string, password: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/authenticate`, { email, password });
+  }
 
+  setToLocalStorage(key: string, value: string) {
+    localStorage.setItem(key, value);
+  }
+
+  getFromLocalStorage(key: string) {
+    return localStorage.getItem(key);
+  }
+
+  isAuthenticated() {
+    return !!this.getFromLocalStorage("token");
+  }
   forgotPassword(email: string): Observable<any> {
     return this.http.post("http://localhost:8080/api/user/forgot-password", { email });
   }
-  getRoles(): Observable<string[]> {
-    return this.http.get<string[]>(`${this.apiUrl}/roles`); // Assurez-vous que votre backend fournit une API pour récupérer les rôles
+  getPendingUsers(): Observable<any> {
+    return this.http.get<any>('http://localhost:8080/api/authentication/pending-users');
+  }
+
+  approveAccount(userId: number): Observable<any> {
+    const headers = new HttpHeaders().set('Content-Type', 'application/json');
+  const params = new HttpParams().set('idU', userId.toString()).set('status', 'APPROVED'); 
+    return this.http.post<any>('http://localhost:8080/api/authentication/change-account-status', {}, { headers, params });
   }
 }
+  
+  
+      
