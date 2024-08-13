@@ -33,12 +33,12 @@ export class LoginComponent implements OnInit {Form: FormGroup;
     console.log('Form values:', this.Form.value);
 
     this.authService.authenticate(this.Form.value.email, this.Form.value.password).subscribe({
-      next: (data: { token: string; id: string; role: string }) => {
-        console.log('Login successful:', data);
+      next: (data: { token: string; refreshToken: string; id: string; role: string }) => {
         this.authService.setToLocalStorage("token", data.token);
+        this.authService.setToLocalStorage("refreshToken", data.refreshToken);
         this.authService.setToLocalStorage("id", data.id);
         this.authService.setToLocalStorage("role", data.role);
-
+    
         if (data.role === 'ADMIN') {
           this.router.navigate(['/admin']);
         } else {
@@ -46,7 +46,6 @@ export class LoginComponent implements OnInit {Form: FormGroup;
         }
       },
       error: (err: { status: number }) => {
-        console.error('Login error:', err);
         if (err.status === 401) {
           this.message = 'Bad Credential';
         }

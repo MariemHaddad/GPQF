@@ -5,17 +5,23 @@ import { HomeComponent } from './components/home/home.component';
 import { LoginComponent } from './components/auth/login/login.component';
 import { ForgetpasswordComponent } from './components/auth/forgetpassword/forgetpassword.component';
 import { AdminComponent } from './components/auth/admin/admin.component';
+import { ProjectsComponent } from './components/projects/projects.component';
+import { PhasesComponent } from './components/phases/phases.component';
+import { ChecklistsComponent } from './components/checklists/checklists.component';
 
 const routes: Routes = [
-  {path:'', component:HomeComponent},
-  {path:'register', component:RegisterComponent},
-  {path:'login', component:LoginComponent},
-  {path:'forgotpassword', component:ForgetpasswordComponent},
+  { path: '', redirectTo: '/projects', pathMatch: 'full' }, // Redirection par défaut
+  { path: 'register', component: RegisterComponent },
+  { path: 'login', component: LoginComponent },
+  { path: 'forgotpassword', component: ForgetpasswordComponent },
   { path: 'home', component: HomeComponent },
-  { path: 'admin', component: AdminComponent }
-
+  { path: 'admin', component: AdminComponent },
+  { path: 'projects', component: ProjectsComponent },
+  { path: 'projects/:projetId/phases', component: PhasesComponent },
+  { path: 'phases/:projetId', component: PhasesComponent },
+  { path: 'checklists/:phaseId', component: ChecklistsComponent },
+  { path: '**', redirectTo: '/projects' } // Redirection pour les routes non définies
 ];
-
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]

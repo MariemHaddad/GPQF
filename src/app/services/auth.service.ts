@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { JwtHelperService } from '@auth0/angular-jwt';
-import { Observable, catchError, map, tap, throwError } from 'rxjs';
+import { Observable, catchError, map, of, tap, throwError } from 'rxjs';
 
 
 @Injectable({
@@ -29,27 +29,42 @@ export class AuthService {
     
   }
 
-  logout(): void {
-    localStorage.removeItem('token');
-    this.router.navigate(['/login']);
+ 
+  refreshToken(): Observable<any> {
+    const refreshToken = this.getFromLocalStorage('refreshToken');
+    return this.http.post<any>(`${this.apiUrl}/refresh-token`, { refreshToken }).pipe(
+        map((response: any) => response.token)
+    );
   }
 
- 
+  
   authenticate(email: string, password: string): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/authenticate`, { email, password });
   }
+
+  // La méthode refreshToken reste la même
 
   setToLocalStorage(key: string, value: string) {
     localStorage.setItem(key, value);
   }
 
-  getFromLocalStorage(key: string) {
+  getFromLocalStorage(key: string): string | null {
     return localStorage.getItem(key);
   }
 
-  isAuthenticated() {
-    return !!this.getFromLocalStorage("token");
+  isAuthenticated(): boolean {
+    const token = this.getFromLocalStorage(this.tokenKey);
+    // Vérifie si le token existe
+    return token !== null;
   }
+
+  logout(): void {
+    localStorage.removeItem('token');
+    this.router.navigate(['/login']);
+  }
+
+
+
   forgotPassword(email: string): Observable<any> {
     return this.http.post("http://localhost:8080/api/user/forgot-password", { email });
   }
@@ -61,6 +76,23 @@ export class AuthService {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
   const params = new HttpParams().set('idU', userId.toString()).set('status', 'APPROVED'); 
     return this.http.post<any>('http://localhost:8080/api/authentication/change-account-status', {}, { headers, params });
+  }
+  hasRole(role: string): boolean {
+    const token = this.getFromLocalStorage(this.tokenKey);
+    if (!token) {
+      return false;
+    }
+
+    const decodedToken = this.jwtHelper.decodeToken(token);
+    const roles = decodedToken.roles || []; // Assuming roles are stored under 'roles' in the token
+
+    return roles.includes(role);
+  }
+
+  private handleError(error: HttpErrorResponse) {
+    // Customize the error handling logic here as needed
+    console.error('An error occurred:', error);
+    return throwError(() => new Error('Something bad happened; please try again later.'));
   }
 }
   

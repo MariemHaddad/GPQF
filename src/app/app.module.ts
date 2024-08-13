@@ -14,7 +14,10 @@ import { AdminComponent } from './components/auth/admin/admin.component';
 import { AuthService } from './services/auth.service';
 import { JwtModule } from '@auth0/angular-jwt';
 import { UsersComponent } from './components/auth/admin/users/users.component';
-import { JwtInterceptorService } from './services/jwt-interceptor.service';  // Ensure this path is correct
+import { JwtInterceptorService } from './services/jwt-interceptor.service';
+import { ProjectsComponent } from './components/projects/projects.component';
+import { PhasesComponent } from './components/phases/phases.component';
+import { ChecklistsComponent } from './components/checklists/checklists.component';  // Ensure this path is correct
 
 @NgModule({
   declarations: [
@@ -26,7 +29,10 @@ import { JwtInterceptorService } from './services/jwt-interceptor.service';  // 
     AdminComponent,
     LoginComponent,
     ForgetpasswordComponent,
-    UsersComponent
+    UsersComponent,
+    ProjectsComponent,
+    PhasesComponent,
+    ChecklistsComponent
   ],
   imports: [
     BrowserModule,
