@@ -2,6 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { JwtHelperService } from '@auth0/angular-jwt';
+
 import { Observable, catchError, map, of, tap, throwError } from 'rxjs';
 
 
@@ -13,7 +14,7 @@ export class AuthService {
   private apiUrl = 'http://localhost:8080/api/authentication';
   private tokenKey: string = 'token';
   private loggedInUsername: string = '';
-  constructor(private http: HttpClient, private router: Router) { }
+  constructor(private http: HttpClient, private router: Router,) { }
   setLoggedInUsername(username: string) {
     this.loggedInUsername = username;
     console.log("Nom d'utilisateur stocké :", username);
@@ -39,7 +40,14 @@ export class AuthService {
 
   
   authenticate(email: string, password: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/authenticate`, { email, password });
+    return this.http.post<any>(`${this.apiUrl}/authenticate`, { email, password }).pipe(
+      tap(response => {
+        if (response && response.token) {
+          this.setToLocalStorage(this.tokenKey, response.token);
+          console.log('Jeton stocké:', response.token); // Vérifiez que le jeton est stocké correctement
+        }
+      })
+    );
   }
 
   // La méthode refreshToken reste la même
@@ -49,7 +57,9 @@ export class AuthService {
   }
 
   getFromLocalStorage(key: string): string | null {
-    return localStorage.getItem(key);
+    const value = localStorage.getItem(key);
+    console.log(`Valeur stockée pour ${key}:`, value); // Vérifiez que la valeur est correcte
+    return value;
   }
 
   isAuthenticated(): boolean {
@@ -80,19 +90,21 @@ export class AuthService {
   hasRole(role: string): boolean {
     const token = this.getFromLocalStorage(this.tokenKey);
     if (!token) {
+      console.log('Token non trouvé');
       return false;
     }
-
-    const decodedToken = this.jwtHelper.decodeToken(token);
-    const roles = decodedToken.roles || []; // Assuming roles are stored under 'roles' in the token
-
-    return roles.includes(role);
-  }
-
-  private handleError(error: HttpErrorResponse) {
-    // Customize the error handling logic here as needed
-    console.error('An error occurred:', error);
-    return throwError(() => new Error('Something bad happened; please try again later.'));
+  
+    try {
+      const decodedToken = this.jwtHelper.decodeToken(token);
+      console.log('Jeton décodé:', decodedToken); // Vérifiez le contenu du jeton
+      const userRole = decodedToken.role; // Utilisez 'role' au lieu de 'roles'
+      console.log('Rôle utilisateur:', userRole); // Affichez le rôle utilisateur
+      // Comparez le rôle utilisateur avec le rôle recherché en ajoutant le préfixe 'ROLE_'
+      return userRole === `ROLE_${role}`;
+    } catch (error) {
+      console.error('Erreur lors du décodage du jeton:', error);
+      return false;
+    }
   }
 }
   

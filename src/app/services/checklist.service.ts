@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, throwError } from 'rxjs';
+import { catchError, Observable, switchMap, throwError } from 'rxjs';
 import { Checklist } from '../modules/checklist';
 import { ChecklistItem } from '../modules/checklistItem';
 
@@ -30,4 +30,9 @@ export class ChecklistService {
   updateChecklistItems(checklistId: number, items: ChecklistItem[]): Observable<any> {
     return this.http.put(`${this.apiUrl}/updateItems/${checklistId}`, items);
   }
-}
+  updateChecklist(checklist: Checklist): Observable<any> {
+    console.log('Checklist à mettre à jour:', checklist); // Log the checklist data
+    return this.http.put(`${this.apiUrl}/updateItems/${checklist.idCh}`, checklist.items, { responseType: 'text' }).pipe(
+      switchMap(() => this.http.put(`${this.apiUrl}/updateStatus/${checklist.idCh}`, { status: checklist.status, remarque: checklist.remarque }, { responseType: 'text' }))
+    );
+  }}

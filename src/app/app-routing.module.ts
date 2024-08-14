@@ -10,13 +10,16 @@ import { PhasesComponent } from './components/phases/phases.component';
 import { ChecklistsComponent } from './components/checklists/checklists.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: '/projects', pathMatch: 'full' }, // Redirection par défaut
+   // Redirection par défaut
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
   { path: 'forgotpassword', component: ForgetpasswordComponent },
   { path: 'home', component: HomeComponent },
+
   { path: 'admin', component: AdminComponent },
   { path: 'projects', component: ProjectsComponent },
+  { path: 'home/:activityId/projects', component: ProjectsComponent },
+  {path:'activites/:id',component: ProjectsComponent},
   { path: 'projects/:projetId/phases', component: PhasesComponent },
   { path: 'phases/:projetId', component: PhasesComponent },
   { path: 'checklists/:phaseId', component: ChecklistsComponent },

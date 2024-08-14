@@ -30,36 +30,82 @@
   
   .checklist-status {
     margin-top: 20px;
-  }
-  
-  .checklist-status p {
+}
+
+.checklist-status p {
     font-size: 16px;
-  }
+}
+
+.btn-modifier {
+    background-color: #28a745; /* Couleur verte */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-bottom: 20px; /* Espacement en dessous du bouton */
+}
+
+.btn-modifier:hover {
+    background-color: #218838; /* Couleur verte plus foncée au survol */
+}
 </style>
 <div class="checklist-container">
-    <h2 class="checklist-title">Checklist de Revue de {{ phaseDescription }} du Projet {{ NomP }}</h2>
-    
-    <!-- Tableau des items de la checklist -->
-    <table *ngIf="checklist">
-      <thead>
-        <tr>
-          <th>Description</th>
-          <th>Résultat</th>
-          <th>Commentaire</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let item of checklist.items">
-          <td>{{ item.description }}</td>
-          <td>{{ item.resultat }}</td>
-          <td>{{ item.commentaire }}</td>
-        </tr>
-      </tbody>
-    </table>
-    
-    <!-- Informations sur la checklist -->
-    <div class="checklist-status">
+  <h2 class="checklist-title">Checklist de Revue de {{ phaseDescription }} du Projet {{ NomP }}</h2>
+  <div *ngIf="isRQualite">
+  <button type="button" class="btn-modifier" *ngIf="!isEditing" (click)="startEditing()">Modifier</button>
+</div>
+  <!-- Tableau des items de la checklist -->
+  <table *ngIf="checklist">
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th>Résultat</th>
+        <th>Commentaire</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of checklist.items">
+        <td>{{ item.description }}</td>
+        <td>
+          <!-- Champ modifiable si en mode édition -->
+          <ng-container *ngIf="isEditing; else readonlyResult">
+            <input [(ngModel)]="item.resultat" type="text" />
+          </ng-container>
+          <ng-template #readonlyResult>{{ item.resultat }}</ng-template>
+        </td>
+        <td>
+          <!-- Champ modifiable si en mode édition -->
+          <ng-container *ngIf="isEditing; else readonlyComment">
+            <input [(ngModel)]="item.commentaire" type="text" />
+          </ng-container>
+          <ng-template #readonlyComment>{{ item.commentaire }}</ng-template>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Informations sur la checklist -->
+  <div class="checklist-status">
+    <div *ngIf="isEditing">
+      <p><strong>Statut:</strong> 
+        <select [(ngModel)]="checklist.status">
+          <option *ngFor="let option of statusOptions" [value]="option">{{ option }}</option>
+        </select>
+      </p>
+      <p><strong>Remarque:</strong> 
+        <input [(ngModel)]="checklist.remarque" type="text" />
+      </p>
+    </div>
+    <div *ngIf="!isEditing">
       <p><strong>Statut:</strong> {{ checklist.status }}</p>
       <p><strong>Remarque:</strong> {{ checklist.remarque }}</p>
     </div>
   </div>
+
+  <!-- Boutons Modifier et Enregistrer les modifications -->
+  <div *ngIf="isRQualite">
+    <button type="submit" class="btn btn-primary btn-user btn-block" *ngIf="isEditing" (click)="saveChecklist()">Enregistrer les modifications</button>
+  </div>
+</div>
