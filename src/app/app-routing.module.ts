@@ -8,6 +8,7 @@ import { AdminComponent } from './components/auth/admin/admin.component';
 import { ProjectsComponent } from './components/projects/projects.component';
 import { PhasesComponent } from './components/phases/phases.component';
 import { ChecklistsComponent } from './components/checklists/checklists.component';
+import { CausalAnalysisComponent } from './components/causal-analysis/causal-analysis.component';
 
 const routes: Routes = [
    // Redirection par défaut
@@ -23,6 +24,7 @@ const routes: Routes = [
   { path: 'projects/:projetId/phases', component: PhasesComponent },
   { path: 'phases/:projetId', component: PhasesComponent },
   { path: 'checklists/:phaseId', component: ChecklistsComponent },
+  { path: 'causal-analysis/:checklistId', component: CausalAnalysisComponent },
   { path: '**', redirectTo: '/projects' } // Redirection pour les routes non définies
 ];
 @NgModule({

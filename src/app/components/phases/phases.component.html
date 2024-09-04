@@ -433,6 +433,7 @@ text-decoration: underline; /* Souligne le texte lorsque la classe hovered est a
                           <th>Dates prévues</th>
                           <th>État</th>
                           <th>Revue</th>
+                          <th>Analyse Causale</th> <!-- Nouvelle colonne pour Analyse Causale -->
                         </tr>
                       </thead>
                       <tbody>
@@ -452,8 +453,9 @@ text-decoration: underline; /* Souligne le texte lorsque la classe hovered est a
                           <td>
                             <button class="btn btn-outline-info btn-sm" (click)="viewChecklist(phase)">Afficher Checklist</button>
                           </td>
+                          <td>
+                            <button *ngIf="phase.checklist?.status === 'REFUSE'" class="btn btn-outline-info btn-sm" (click)="viewCausalAnalysis(phase)">Afficher Analyse Causale</button>
+                          </td>
                         </tr>
                       </tbody>
-                    </table>
-                  </div>
                   

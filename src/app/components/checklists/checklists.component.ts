@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Checklist } from 'src/app/modules/checklist';
 import { AuthService } from 'src/app/services/auth.service';
 import { ChecklistService } from 'src/app/services/checklist.service';
-
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-checklists',
   templateUrl: './checklists.component.html',
@@ -26,7 +26,8 @@ export class ChecklistsComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private checklistService: ChecklistService,
-    private authService: AuthService // Injection du service d'authentification
+    private authService: AuthService, // Injection du service d'authentification
+    private router: Router 
   ) { }
 
   ngOnInit(): void {
@@ -56,13 +57,17 @@ export class ChecklistsComponent implements OnInit {
     console.log('Mode édition activé'); // Ajoutez ce log pour vérifier si la méthode est appelée
     this.isEditing = true;
   }
-  
 
   saveChecklist() {
     console.log('Sauvegarde des modifications'); // Ajoutez ce log pour vérifier si la méthode est appelée
     this.checklistService.updateChecklist(this.checklist).subscribe(
       response => {
         console.log('Checklist mise à jour avec succès');
+        if (this.checklist.status === 'REFUSE') {
+          if (confirm('Vous devez remplir une analyse causale pour définir la raison de refus de la checklist. Voulez-vous continuer ?')) {
+            this.router.navigate(['/causal-analysis', this.checklist.idCh]);
+          }
+        }
         this.isEditing = false; // Quitter le mode édition après la sauvegarde
       },
       error => {

@@ -14,7 +14,6 @@ export class ActiviteService {
   getActivites(): Observable<Activite[]> {
     return this.http.get<Activite[]>(`${this.baseUrl}/getActivities`);
   }
-
   ajouterActivite(activite: Activite): Observable<string> {
     return this.http.post<string>(`${this.baseUrl}/ajouter`, activite);
   }

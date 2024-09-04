@@ -172,7 +172,13 @@ export class PhasesComponent implements OnInit {
       console.error('Phase ID is undefined.');
     }
   }
-
+  viewCausalAnalysis(phase: Phase) {
+    if (phase.checklist?.idCh) {
+      this.router.navigate(['/causal-analysis', phase.checklist.idCh]);
+    } else {
+      console.error('Checklist ID is undefined.');
+    }
+  }
   private formatDate(dateString: string | undefined): string | undefined {
     return dateString ? new Date(dateString).toISOString().split('T')[0] : undefined;
   }

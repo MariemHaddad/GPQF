@@ -17,7 +17,9 @@ import { UsersComponent } from './components/auth/admin/users/users.component';
 import { JwtInterceptorService } from './services/jwt-interceptor.service';
 import { ProjectsComponent } from './components/projects/projects.component';
 import { PhasesComponent } from './components/phases/phases.component';
-import { ChecklistsComponent } from './components/checklists/checklists.component';  // Ensure this path is correct
+import { ChecklistsComponent } from './components/checklists/checklists.component';
+import { CausalAnalysisComponent } from './components/causal-analysis/causal-analysis.component';  // Ensure this path is correct
+import { CausalAnalysisService } from './services/causal-analysis.service';
 
 @NgModule({
   declarations: [
@@ -32,7 +34,8 @@ import { ChecklistsComponent } from './components/checklists/checklists.componen
     UsersComponent,
     ProjectsComponent,
     PhasesComponent,
-    ChecklistsComponent
+    ChecklistsComponent,
+    CausalAnalysisComponent
   ],
   imports: [
     BrowserModule,
@@ -43,7 +46,8 @@ import { ChecklistsComponent } from './components/checklists/checklists.componen
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptorService, multi: true },
-    AuthService
+    AuthService,
+    CausalAnalysisService
   ],
   bootstrap: [AppComponent]
 })

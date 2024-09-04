@@ -109,3 +109,12 @@
     <button type="submit" class="btn btn-primary btn-user btn-block" *ngIf="isEditing" (click)="saveChecklist()">Enregistrer les modifications</button>
   </div>
 </div>
+<script>
+  function handleRefusedStatus() {
+    if (this.checklist.status === 'REFUSE') {
+      if (confirm('Vous devez remplir une analyse causale pour définir la raison de refus de la checklist. Voulez-vous continuer ?')) {
+        this.router.navigate(['/causal-analysis'], { queryParams: { checklistId: this.checklist.idCh } });
+      }
+    }
+  }
+</script>

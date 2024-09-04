@@ -1,0 +1,222 @@
+<style>
+    .analyse-container {
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+    }
+  
+    .form-group {
+      margin-bottom: 15px;
+    }
+  
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+  
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+  
+    input[readonly] {
+      background-color: #e9ecef;
+    }
+  
+    .analysis-section {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background-color: #fff;
+    }
+  
+    h3 {
+      color: #007bff;
+      margin-bottom: 15px;
+    }
+  
+    .analysis-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+  
+    .analysis-table th, .analysis-table td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+  
+    .analysis-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+    }
+  
+    .btn-save, .btn-add-cause {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+      display: inline-block;
+    }
+  
+    .btn-save:hover, .btn-add-cause:hover {
+      background-color: #218838;
+    }
+  
+    .saved-analysis {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background-color: #fff;
+    }
+  
+    .saved-analysis p {
+      margin: 5px 0;
+    }
+    .analyse-title {
+  text-align: center;
+  color: #87CEEB;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+  </style>
+  
+
+  <div class="analyse-container">
+    <h2 class="analyse-title">Analyse Causale</h2>
+    <!-- Type de problème et méthode d'analyse -->
+    <div class="form-group">
+      <label for="typeProbleme">Type de problème:</label>
+      <input id="typeProbleme" [(ngModel)]="analyseCausale.typeProbleme" placeholder="Type de problème">
+  
+      <label for="identificationProbleme">Identification du problème:</label>
+      <input id="identificationProbleme" [(ngModel)]="analyseCausale.identificationProbleme" placeholder="Identification du problème">
+  
+      <label for="methodeAnalyse">Sélectionner la méthode d'analyse:</label>
+      <select id="methodeAnalyse" [(ngModel)]="analyseCausale.methodeAnalyse" (change)="initializeAnalysis()">
+        <option value="FIVE_WHYS">5 Whys</option>
+        <option value="ISHIKAWA">Ishikawa</option>
+      </select>
+    </div>
+  
+    <!-- Formulaire 5 Whys -->
+    <div *ngIf="analyseCausale.methodeAnalyse === 'FIVE_WHYS'" class="analysis-section">
+      <h3>Analyse 5P</h3>
+      <table class="analysis-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Pourquoi</th>
+            <th>Pourcentage</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let pourquoi of analyseCausale.cinqPourquoi; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td><input [(ngModel)]="pourquoi.question" placeholder="Question" [attr.readonly]="!isRqualite ? true : null"></td>
+            <td><input type="number" [(ngModel)]="pourquoi.pourcentage" placeholder="Pourcentage" [attr.readonly]="!isRqualite ? true : null"></td>
+            <td><input [(ngModel)]="pourquoi.action" placeholder="Action" [attr.readonly]="!isRqualite ? true : null"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  
+    <!-- Formulaire Ishikawa -->
+    <div *ngIf="analyseCausale.methodeAnalyse === 'ISHIKAWA'" class="analysis-section">
+      <h3>Analyse Ishikawa</h3>
+      <table class="analysis-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Description</th>
+            <th>Catégorie</th>
+            
+            <th>Pourcentage</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let cause of analyseCausale.causesIshikawa; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td><input [(ngModel)]="cause.description" placeholder="Description" [attr.readonly]="!isRqualite ? true : null"></td>
+            <td><input [(ngModel)]="cause.categorie" placeholder="Catégorie" [attr.readonly]="!isRqualite ? true : null"></td>
+            <td><input type="number" [(ngModel)]="cause.pourcentage" placeholder="Pourcentage" [attr.readonly]="!isRqualite ? true : null"></td>
+            <td><input [(ngModel)]="cause.action" placeholder="Action" [attr.readonly]="!isRqualite ? true : null"></td>
+          </tr>
+        </tbody>
+      </table>
+      <button (click)="addCause()" *ngIf="isRqualite" class="btn-add-cause">Ajouter une Cause</button>
+    </div>
+  
+    <!-- Bouton de sauvegarde -->
+    <button (click)="saveCausalAnalysis()" *ngIf="isRqualite" class="btn-save">Sauvegarder l'analyse causale</button>
+  
+    <!-- Affichage de l'analyse causale après sauvegarde -->
+    <div *ngIf="savedAnalyseCausale" class="saved-analysis">
+      <h3>Analyse causale sauvegardée</h3>
+      <p><strong>Type de problème:</strong> {{ savedAnalyseCausale.typeProbleme }}</p>
+      <p><strong>Identification du problème:</strong> {{ savedAnalyseCausale.identificationProbleme }}</p>
+      <p><strong>Méthode d'analyse:</strong> {{ savedAnalyseCausale.methodeAnalyse }}</p>
+  
+      <!-- Formulaire 5 Whys sauvegardé -->
+      <div *ngIf="savedAnalyseCausale.methodeAnalyse === 'FIVE_WHYS'" class="analysis-section">
+        <h3>Analyse 5 Whys</h3>
+        <table class="analysis-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Why</th>
+              <th>Pourcentage</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let pourquoi of savedAnalyseCausale.cinqPourquoi; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td><input [(ngModel)]="pourquoi.question" placeholder="Question" readonly></td>
+              <td><input type="number" [(ngModel)]="pourquoi.pourcentage" placeholder="Pourcentage" readonly></td>
+              <td><input [(ngModel)]="pourquoi.action" placeholder="Action" readonly></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+  
+      <!-- Formulaire Ishikawa sauvegardé -->
+      <div *ngIf="savedAnalyseCausale.methodeAnalyse === 'ISHIKAWA'" class="analysis-section">
+        <h3>Analyse Ishikawa</h3>
+        <table class="analysis-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Description</th>
+              <th>Catégorie</th>
+              <th>Pourcentage</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let cause of savedAnalyseCausale.causesIshikawa; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td><input [(ngModel)]="cause.description" placeholder="Description" readonly></td>
+              <td><input [(ngModel)]="cause.categorie" placeholder="Catégorie" readonly></td>
+              <td><input type="number" [(ngModel)]="cause.pourcentage" placeholder="Pourcentage" readonly></td>
+              <td><input [(ngModel)]="cause.action" placeholder="Action" readonly></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  
