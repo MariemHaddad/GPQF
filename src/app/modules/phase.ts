@@ -9,8 +9,11 @@ export class Phase {
     effectiveStartDate?: string; // Optional
     effectiveEndDate?: string;   // Optional
     etat?: string;
+    effortPlanifie?: number; // Ajouté
+    effortActuel?: number;
     checklist: Checklist | null;
-
+    effortVariance?: number; 
+    scheduleVariance?: number;
     constructor(
         idPh: number,
         description: string,
@@ -20,7 +23,11 @@ export class Phase {
         checklist: Checklist | null,
         effectiveStartDate?: string,
         effectiveEndDate?: string,
-        etat?: string
+        etat?: string,
+        effortPlanifie?: number, // Ajouté
+        effortActuel?: number,
+        effortVariance?: number, // Ajoute cette propriété
+  scheduleVariance?: number
     ) {
         this.idPh = idPh;
         this.description = description;
@@ -30,6 +37,10 @@ export class Phase {
         this.effectiveStartDate = effectiveStartDate;
         this.effectiveEndDate = effectiveEndDate;
         this.etat = etat;
+        this.effortPlanifie= effortPlanifie;
+        this.effortActuel= effortActuel;
         this.checklist = checklist;
+        this.effortVariance= effortVariance;
+        this.scheduleVariance = scheduleVariance;
     }
 }

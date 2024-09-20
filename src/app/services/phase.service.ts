@@ -40,4 +40,12 @@ export class PhaseService {
   getPhasesByProjet(projetId: number): Observable<Phase[]> {
    return this.http.get<Phase[]>(`${this.apiUrl}/projet/${projetId}`, { params: { projetId: projetId.toString() } });
 }
+getEffortVariance(phaseId: number): Observable<number> {
+  return this.http.get<number>(`${this.apiUrl}/${phaseId}/effortVariance`);
+}
+
+// Récupérer le schedule variance
+getScheduleVariance(phaseId: number): Observable<number> {
+  return this.http.get<number>(`${this.apiUrl}/${phaseId}/scheduleVariance`);
+}
 }

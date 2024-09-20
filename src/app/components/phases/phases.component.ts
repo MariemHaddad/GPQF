@@ -5,7 +5,9 @@ import { Phase } from 'src/app/modules/phase';
 import { ChecklistService } from 'src/app/services/checklist.service';
 import { PhaseService } from 'src/app/services/phase.service';
 import { AuthService } from 'src/app/services/auth.service'; // Service d'authentification
+import { Chart, registerables } from 'chart.js/auto';
 
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 @Component({
   selector: 'app-phases',
   templateUrl: './phases.component.html',
@@ -20,7 +22,13 @@ export class PhasesComponent implements OnInit {
   isRqualite: boolean = false; 
   isEditMode: boolean = false;
   phasesToAdd: Phase[] = [];
-  
+  showForm: boolean = false;
+  // Variables pour les variances
+  effortVariances: number[] = [];
+  scheduleVariances: number[] = [];
+  chartEffort: any;
+  chartSchedule: any;
+
   constructor(
     private phaseService: PhaseService,
     private checklistService: ChecklistService,
@@ -34,6 +42,10 @@ export class PhasesComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Registering Chart.js components (including scales)
+    Chart.register(...registerables);
+
+    // Subscribe to route params to get projetId
     this.route.paramMap.subscribe(params => {
       const projetIdParam = params.get('projetId');
       if (projetIdParam) {
@@ -45,6 +57,9 @@ export class PhasesComponent implements OnInit {
     });
 
     this.isRqualite = this.authService.hasRole('Rqualite');
+
+    // Initialize charts after loading data
+    this.createCharts();
   }
 
   loadPhases() {
@@ -59,7 +74,7 @@ export class PhasesComponent implements OnInit {
             effectiveStartDate: phase.effectiveStartDate ? new Date(phase.effectiveStartDate).toISOString().split('T')[0] : undefined,
             effectiveEndDate: phase.effectiveEndDate ? new Date(phase.effectiveEndDate).toISOString().split('T')[0] : undefined
           }));
-          
+
           // Load checklists for phases
           this.phases.forEach(phase => {
             if (phase.idPh) {
@@ -77,7 +92,10 @@ export class PhasesComponent implements OnInit {
               );
             }
           });
-  
+
+          // Load variances
+          this.loadVariances();
+
           if (this.phases.length === 0) {
             this.message = 'Aucune phase disponible pour ce projet.';
           }
@@ -88,6 +106,134 @@ export class PhasesComponent implements OnInit {
         }
       );
     }
+  }
+
+  loadVariances() {
+    this.effortVariances = [];
+    this.scheduleVariances = [];
+
+    this.phases.forEach(phase => {
+      if (phase.idPh) {
+        this.phaseService.getEffortVariance(phase.idPh).subscribe(effort => {
+          console.log(`Effort variance for phase ${phase.description}:`, effort);
+          this.effortVariances.push(effort);
+        });
+        this.phaseService.getScheduleVariance(phase.idPh).subscribe(schedule => {
+          console.log(`Schedule variance for phase ${phase.description}:`, schedule);
+          this.scheduleVariances.push(schedule);
+        });
+      }
+    });
+
+    // Delay to ensure data is ready before creating charts
+    setTimeout(() => {
+      console.log('Effort Variances:', this.effortVariances);
+      console.log('Schedule Variances:', this.scheduleVariances);
+      this.createCharts();
+    }, 1000); // Wait for data to load before rendering charts
+  }
+
+  createCharts() {
+    setTimeout(() => {
+      const ctxEffort = document.getElementById('effortChart') as HTMLCanvasElement;
+      const ctxSchedule = document.getElementById('scheduleChart') as HTMLCanvasElement;
+  
+      if (this.chartEffort) {
+        this.chartEffort.destroy();
+      }
+  
+      this.chartEffort = new Chart(ctxEffort, {
+        type: 'line',
+        data: {
+          labels: this.phases.map(p => p.description), // Phase labels
+          datasets: [{
+            label: 'Effort Variance',
+            data: this.effortVariances,
+            borderColor: 'rgba(75, 192, 192, 1)',
+            fill: false,
+            pointRadius: 5, // Adjust point size
+            pointBackgroundColor: 'rgba(75, 192, 192, 1)'
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Effort Variance'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Phases'
+              }
+            }
+          },
+          plugins: {
+            datalabels: {
+              anchor: 'end',
+              align: 'top',
+              formatter: (value) => `${value.toFixed(2)}h`, // Format values as hours with 2 decimals
+              font: {
+                size: 10
+              }
+            }
+          }
+        },
+        plugins: [ChartDataLabels]
+      });
+  
+      if (this.chartSchedule) {
+        this.chartSchedule.destroy();
+      }
+  
+      this.chartSchedule = new Chart(ctxSchedule, {
+        type: 'line',
+        data: {
+          labels: this.phases.map(p => p.description), // Phase labels
+          datasets: [{
+            label: 'Schedule Variance',
+            data: this.scheduleVariances,
+            borderColor: 'rgba(153, 102, 255, 1)',
+            fill: false,
+            pointRadius: 5,
+            pointBackgroundColor: 'rgba(153, 102, 255, 1)'
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Schedule Variance'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Phases'
+              }
+            }
+          },
+          plugins: {
+            datalabels: {
+              anchor: 'end',
+              align: 'top',
+              formatter: (value) => `${value.toFixed(2)} days`, // Format as days
+              font: {
+                size: 10
+              }
+            }
+          }
+        },
+        plugins: [ChartDataLabels]
+      });
+    }, 500); // Delay to ensure proper rendering
   }
 
   addPhases() {
@@ -172,6 +318,7 @@ export class PhasesComponent implements OnInit {
       console.error('Phase ID is undefined.');
     }
   }
+  
   viewCausalAnalysis(phase: Phase) {
     if (phase.checklist?.idCh) {
       this.router.navigate(['/causal-analysis', phase.checklist.idCh]);
@@ -179,11 +326,11 @@ export class PhasesComponent implements OnInit {
       console.error('Checklist ID is undefined.');
     }
   }
+  
   private formatDate(dateString: string | undefined): string | undefined {
     return dateString ? new Date(dateString).toISOString().split('T')[0] : undefined;
   }
   
-
   private resetNouvellePhase() {
     this.nouvellePhase = new Phase(
       0, '', '', '', '', new Checklist(0, '', '', [], {} as Phase), '', '', 'EN_ATTENTE'
