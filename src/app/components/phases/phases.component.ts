@@ -357,16 +357,15 @@ editPhase(phase: Phase) {
 
   // Initialisez le formulaire avec les anciennes valeurs, y compris effortActuel et effortPlanifie
   this.editPhaseForm = new FormGroup({
-    description: new FormControl(this.selectedPhase.description, Validators.required),
-    objectifs: new FormControl(this.selectedPhase.objectifs),
-    plannedStartDate: new FormControl(this.selectedPhase.plannedStartDate),
-    plannedEndDate: new FormControl(this.selectedPhase.plannedEndDate),
-    effectiveStartDate: new FormControl(this.selectedPhase.effectiveStartDate),
-    effectiveEndDate: new FormControl(this.selectedPhase.effectiveEndDate),
-    effortActuel: new FormControl(this.selectedPhase.effortActuel),
-    effortPlanifie: new FormControl(this.selectedPhase.effortPlanifie),// Ajout de l'effort actuel
-  });
-}
+    description: new FormControl(this.selectedPhase?.description, [Validators.required]),
+    objectifs: new FormControl(this.selectedPhase?.objectifs),
+    plannedStartDate: new FormControl(this.selectedPhase?.plannedStartDate),
+    plannedEndDate: new FormControl(this.selectedPhase?.plannedEndDate),
+    effectiveStartDate: new FormControl(this.selectedPhase?.effectiveStartDate),
+    effectiveEndDate: new FormControl(this.selectedPhase?.effectiveEndDate),
+    effortActuel: new FormControl(this.selectedPhase?.effortActuel, [Validators.required]),
+    effortPlanifie: new FormControl(this.selectedPhase?.effortPlanifie, [Validators.required])
+  });}
 
 savePhase() {
   if (this.selectedPhase) {
@@ -395,20 +394,27 @@ getErrorMessage(error: any): string {
   return 'Une erreur s\'est produite.';
 }
 onSubmitEditPhase() {
-  if (this.editPhaseForm.valid) {
+  if (this.editPhaseForm.valid && this.selectedPhase) {
     const updatedPhase: Phase = {
       ...this.selectedPhase,
-      ...this.editPhaseForm.value // Assure-toi que effortActuel est aussi mis à jour
+      description: this.editPhaseForm.value.description,
+      objectifs: this.editPhaseForm.value.objectifs,
+      plannedStartDate: this.editPhaseForm.value.plannedStartDate,
+      plannedEndDate: this.editPhaseForm.value.plannedEndDate,
+      effectiveStartDate: this.editPhaseForm.value.effectiveStartDate,
+      effectiveEndDate: this.editPhaseForm.value.effectiveEndDate,
+      effortActuel: this.editPhaseForm.value.effortActuel,
+      effortPlanifie: this.editPhaseForm.value.effortPlanifie
     };
-
+    
     this.phaseService.updatePhase(updatedPhase).subscribe(
       response => {
-        console.log('Phase mise à jour:', response);
-        this.loadPhases();
-        this.resetEditMode();
+        console.log('Phase updated successfully', response);
+        this.isEditMode = false;
+        this.loadPhases(); // Reload phases after update
       },
       error => {
-        console.error('Erreur lors de la mise à jour de la phase:', error);
+        console.error('Error updating phase', error);
       }
     );
   }
