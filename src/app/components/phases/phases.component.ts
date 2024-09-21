@@ -8,6 +8,7 @@ import { AuthService } from 'src/app/services/auth.service'; // Service d'authen
 import { Chart, registerables } from 'chart.js/auto';
 
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 @Component({
   selector: 'app-phases',
   templateUrl: './phases.component.html',
@@ -23,12 +24,13 @@ export class PhasesComponent implements OnInit {
   isEditMode: boolean = false;
   phasesToAdd: Phase[] = [];
   showForm: boolean = false;
+  editPhaseForm: any;
   // Variables pour les variances
   effortVariances: number[] = [];
   scheduleVariances: number[] = [];
   chartEffort: any;
   chartSchedule: any;
-
+ 
   constructor(
     private phaseService: PhaseService,
     private checklistService: ChecklistService,
@@ -326,7 +328,91 @@ export class PhasesComponent implements OnInit {
       console.error('Checklist ID is undefined.');
     }
   }
-  
+  deletePhase(id: number | undefined): void {
+    if (id === undefined) {
+        console.error("ID de phase non défini.");
+        return;
+    }
+
+    if (confirm("Êtes-vous sûr de vouloir supprimer cette phase ?")) {
+        this.phaseService.deletePhase(id).subscribe(
+            response => {
+                // Réaction après la suppression réussie
+                this.phases = this.phases.filter(phase => phase.idPh !== id);
+                this.message = response; // Utilisez la réponse texte directement
+                setTimeout(() => {
+                    this.loadPhases(); // Reload phases after a short delay
+                }, 2000); // Adjust delay as necessary
+            },
+            error => {
+                console.error("Erreur lors de la suppression de la phase :", error);
+                alert("Une erreur s'est produite lors de la suppression de la phase.");
+            }
+        );
+    }
+} 
+editPhase(phase: Phase) {
+  this.selectedPhase = { ...phase }; // Créez une copie de la phase à éditer
+  this.isEditMode = true;
+
+  // Initialisez le formulaire avec les anciennes valeurs, y compris effortActuel et effortPlanifie
+  this.editPhaseForm = new FormGroup({
+    description: new FormControl(this.selectedPhase.description, Validators.required),
+    objectifs: new FormControl(this.selectedPhase.objectifs),
+    plannedStartDate: new FormControl(this.selectedPhase.plannedStartDate),
+    plannedEndDate: new FormControl(this.selectedPhase.plannedEndDate),
+    effectiveStartDate: new FormControl(this.selectedPhase.effectiveStartDate),
+    effectiveEndDate: new FormControl(this.selectedPhase.effectiveEndDate),
+    effortActuel: new FormControl(this.selectedPhase.effortActuel),
+    effortPlanifie: new FormControl(this.selectedPhase.effortPlanifie),// Ajout de l'effort actuel
+  });
+}
+
+savePhase() {
+  if (this.selectedPhase) {
+    this.phaseService.updatePhase(this.selectedPhase).subscribe(
+      response => {
+        console.log('Phase mise à jour:', response);
+        this.loadPhases();
+        this.resetEditMode();
+      },
+      error => {
+        console.error('Erreur lors de la mise à jour de la phase:', error);
+        this.message = 'Erreur lors de la mise à jour de la phase.';
+      }
+    );
+  }
+}
+
+resetEditMode() {
+  this.selectedPhase = undefined; // Reset selected phase
+  this.isEditMode = false; // Reset edit mode
+  // Reset editPhaseForm if using Reactive Forms
+}
+
+getErrorMessage(error: any): string {
+  // Handle error messages based on error structure
+  return 'Une erreur s\'est produite.';
+}
+onSubmitEditPhase() {
+  if (this.editPhaseForm.valid) {
+    const updatedPhase: Phase = {
+      ...this.selectedPhase,
+      ...this.editPhaseForm.value // Assure-toi que effortActuel est aussi mis à jour
+    };
+
+    this.phaseService.updatePhase(updatedPhase).subscribe(
+      response => {
+        console.log('Phase mise à jour:', response);
+        this.loadPhases();
+        this.resetEditMode();
+      },
+      error => {
+        console.error('Erreur lors de la mise à jour de la phase:', error);
+      }
+    );
+  }
+}
   private formatDate(dateString: string | undefined): string | undefined {
     return dateString ? new Date(dateString).toISOString().split('T')[0] : undefined;
   }
@@ -337,11 +423,5 @@ export class PhasesComponent implements OnInit {
     );
   }
 
-  private getErrorMessage(error: any): string {
-    if (error.error instanceof ErrorEvent) {
-      return `Erreur côté client: ${error.error.message}`;
-    } else {
-      return `Erreur côté serveur: ${error.status} - ${error.message}`;
-    }
-  }
+  
 }

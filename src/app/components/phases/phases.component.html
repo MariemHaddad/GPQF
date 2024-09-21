@@ -388,9 +388,8 @@ text-decoration: underline; /* Souligne le texte lorsque la classe hovered est a
                             <th>Dates prévues</th>
                             <th>Dates effectives</th>
                             <th>État</th>
-                            <th>Effort Planifié</th>
                             <th>Effort Actuel</th>
-                            
+                            <th>Effort Planifié</th>
                             <th>Revue</th>
                             <th>Analyse Causale</th>
                           </tr>
@@ -410,8 +409,9 @@ text-decoration: underline; /* Souligne le texte lorsque la classe hovered est a
                                 {{ phase.etat }}
                               </span>
                             </td>
-                            <td>{{ phase.effortPlanifie || 'N/A' }} jours</td>
                             <td>{{ phase.effortActuel || 'N/A' }} jours</td>
+                            <td>{{ phase.effortPlanifie || 'N/A' }} jours</td>
+                           
                 
                             <td>
                             <button class="btn btn-outline-info btn-sm" (click)="viewChecklist(phase)">Afficher Checklist</button>
@@ -419,66 +419,114 @@ text-decoration: underline; /* Souligne le texte lorsque la classe hovered est a
                           <td>
                             <button *ngIf="phase.checklist?.status === 'REFUSE'" class="btn btn-outline-info btn-sm" (click)="viewCausalAnalysis(phase)">Afficher Analyse Causale</button>
                           </td>
+                          <td>
+                            <!-- Bouton de modification (stylo) -->
+                            <button class="btn btn-outline-primary btn-sm" (click)="editPhase(phase)">
+                              <i class="fas fa-pen"></i>
+                            </button>
+                            <!-- Bouton de suppression -->
+                            <button class="btn btn-danger btn-sm" (click)="deletePhase(phase.idPh!)">
+                              <i class="fas fa-trash"></i>
+                            </button>
+                          </td>
                         </tr>
                       </tbody>
                     </table>
-                  </div>
-                  <button (click)="showForm = !showForm" class="btn btn-primary btn-user btn-block">
-                    {{ showForm ? 'Masquer le formulaire' : 'Ajouter des phases' }}
-                  </button>
-                  
-                  <!-- Formulaire d'ajout de phases -->
-                  <div *ngIf="showForm">
-                    <h3>Ajouter des phases</h3>
-                    <form (ngSubmit)="addPhases()" class="user">
-                      <div class="form-group">
-                        <label for="description">Description</label>
-                        <input
-                          type="text"
-                          [(ngModel)]="nouvellePhase.description"
-                          name="description"
-                          id="description"
-                          class="form-control form-control-user"
-                          placeholder="Description"
-                          required
-                        />
-                      </div>
-                      <div class="form-group">
-                        <label for="objectifs">Objectifs</label>
-                        <textarea
-                          [(ngModel)]="nouvellePhase.objectifs"
-                          name="objectifs"
-                          id="objectifs"
-                          class="form-control form-control-user"
-                          placeholder="Objectifs"
-                          required
-                        ></textarea>
-                      </div>
-                      <div class="form-group row">
-                        <div class="col-sm-6 mb-3 mb-sm-0">
-                          <label for="plannedStartDate">Date de début prévue</label>
+                    <div *ngIf="isEditMode && selectedPhase">
+                        <h3>Modifier la phase</h3>
+                        <form [formGroup]="editPhaseForm" (ngSubmit)="onSubmitEditPhase()">
+                          <div class="form-group">
+                            <label for="description">Description</label>
+                            <input type="text" id="description" formControlName="description" class="form-control" />
+                          </div>
+                          <div class="form-group">
+                            <label for="objectifs">Objectifs</label>
+                            <textarea id="objectifs" formControlName="objectifs" class="form-control"></textarea>
+                          </div>
+                          <div class="form-group">
+                            <label for="plannedStartDate">Date de début prévue</label>
+                            <input type="date" id="plannedStartDate" formControlName="plannedStartDate" class="form-control" />
+                          </div>
+                          <div class="form-group">
+                            <label for="plannedEndDate">Date de fin prévue</label>
+                            <input type="date" id="plannedEndDate" formControlName="plannedEndDate" class="form-control" />
+                          </div>
+                          <div class="form-group">
+                            <label for="effectiveStartDate">Date de début effective</label>
+                            <input type="date" id="effectiveStartDate" formControlName="effectiveStartDate" class="form-control" />
+                          </div>
+                          <div class="form-group">
+                            <label for="effectiveEndDate">Date de fin effective</label>
+                            <input type="date" id="effectiveEndDate" formControlName="effectiveEndDate" class="form-control" />
+                          </div>
+                          <div class="form-group">
+                            <label for="effortActuel">Effort Actuel</label>
+                            <input type="number" id="effortActuel" formControlName="effortActuel" class="form-control" />
+                          </div>
+                          <div class="form-group">
+                            <label for="effortPlanifie">Effort Planifie</label>
+                            <input type="number" id="effortPlanifie" formControlName="effortPlanifie" class="form-control" />
+                          </div>
+                          <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+                        </form>
+                    
+                    </div>
+                    <button (click)="showForm = !showForm" class="btn btn-primary btn-user btn-block">
+                      {{ showForm ? 'Masquer le formulaire' : 'Ajouter des phases' }}
+                    </button>
+                    
+                    <!-- Formulaire d'ajout de phases -->
+                    <div *ngIf="showForm">
+                      <h3>Ajouter des phases</h3>
+                      <form (ngSubmit)="addPhases()" class="user">
+                        <div class="form-group">
+                          <label for="description">Description</label>
                           <input
-                            type="date"
-                            [(ngModel)]="nouvellePhase.plannedStartDate"
-                            name="plannedStartDate"
-                            id="plannedStartDate"
+                            type="text"
+                            [(ngModel)]="nouvellePhase.description"
+                            name="description"
+                            id="description"
                             class="form-control form-control-user"
+                            placeholder="Description"
                             required
                           />
                         </div>
-                        <div class="col-sm-6">
-                          <label for="plannedEndDate">Date de fin prévue</label>
-                          <input
-                            type="date"
-                            [(ngModel)]="nouvellePhase.plannedEndDate"
-                            name="plannedEndDate"
-                            id="plannedEndDate"
+                        <div class="form-group">
+                          <label for="objectifs">Objectifs</label>
+                          <textarea
+                            [(ngModel)]="nouvellePhase.objectifs"
+                            name="objectifs"
+                            id="objectifs"
                             class="form-control form-control-user"
+                            placeholder="Objectifs"
                             required
-                          />
+                          ></textarea>
                         </div>
-                      </div>
-                      
-                      <button type="submit" class="btn btn-primary btn-user btn-block" (click)="addPhaseToList(nouvellePhase)">Ajouter Phase</button>
-                    </form>
-                  </div>
+                        <div class="form-group row">
+                          <div class="col-sm-6 mb-3 mb-sm-0">
+                            <label for="plannedStartDate">Date de début prévue</label>
+                            <input
+                              type="date"
+                              [(ngModel)]="nouvellePhase.plannedStartDate"
+                              name="plannedStartDate"
+                              id="plannedStartDate"
+                              class="form-control form-control-user"
+                              required
+                            />
+                          </div>
+                          <div class="col-sm-6">
+                            <label for="plannedEndDate">Date de fin prévue</label>
+                            <input
+                              type="date"
+                              [(ngModel)]="nouvellePhase.plannedEndDate"
+                              name="plannedEndDate"
+                              id="plannedEndDate"
+                              class="form-control form-control-user"
+                              required
+                            />
+                          </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-user btn-block" (click)="addPhaseToList(nouvellePhase)">Ajouter Phase</button>
+                      </form>
+                    </div>

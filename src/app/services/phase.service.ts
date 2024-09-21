@@ -48,4 +48,11 @@ getEffortVariance(phaseId: number): Observable<number> {
 getScheduleVariance(phaseId: number): Observable<number> {
   return this.http.get<number>(`${this.apiUrl}/${phaseId}/scheduleVariance`);
 }
+deletePhase(id: number): Observable<any> {
+  return this.http.delete(`http://localhost:8080/api/phases/${id}`,{ responseType: 'text' });
+}
+updatePhase(phase: Phase) {
+  return this.http.put<Phase>(`http://localhost:8080/api/phases/updatePhase/${phase.idPh}`, phase);
+}
+
 }
