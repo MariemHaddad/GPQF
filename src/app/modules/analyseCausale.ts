@@ -1,5 +1,6 @@
 import { Pourquoi } from "./pourquoi";
 import { CauseIshikawa } from "./causeIshikawa";
+import { PlanAction } from "./planAction";
 
 export class AnalyseCausale {
     idAN: number;
@@ -9,7 +10,7 @@ export class AnalyseCausale {
     checklistId: number;
     cinqPourquoi: Pourquoi[];
     causesIshikawa: CauseIshikawa[];
-
+   
     constructor(
         idAN: number,
         typeProbleme: string,
@@ -18,6 +19,7 @@ export class AnalyseCausale {
         checklistId: number,
         cinqPourquoi: Pourquoi[],
         causesIshikawa: CauseIshikawa[]
+        
     ) {
         this.idAN = idAN;
         this.typeProbleme = typeProbleme;
@@ -26,5 +28,6 @@ export class AnalyseCausale {
         this.checklistId = checklistId;
         this.cinqPourquoi = cinqPourquoi;
         this.causesIshikawa = causesIshikawa;
+        
     }
 }

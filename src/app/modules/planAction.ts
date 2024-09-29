@@ -11,7 +11,7 @@ export class PlanAction {
   constructor(
     idPa: number = 0,
     leconTirees: string = '',
-    analyseCausale: AnalyseCausale = new AnalyseCausale(),
+    analyseCausale: AnalyseCausale = new AnalyseCausale(0, '', '', '', 0, [], []), 
     actions: Action[] = []
   ) {
     this.idPa = idPa;

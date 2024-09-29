@@ -63,7 +63,14 @@ export class PhasesComponent implements OnInit {
     // Initialize charts after loading data
     this.createCharts();
   }
-
+ 
+  viewCausalAnalysis(phase: Phase) {
+    if (phase.checklist?.idCh) {
+      this.router.navigate(['/causal-analysis', phase.checklist.idCh]);
+    } else {
+      console.error('Checklist ID is undefined.');
+    }
+  }
   loadPhases() {
     if (this.projetId) {
       this.phaseService.getPhasesByProjet(this.projetId).subscribe(
@@ -320,14 +327,7 @@ export class PhasesComponent implements OnInit {
       console.error('Phase ID is undefined.');
     }
   }
-  
-  viewCausalAnalysis(phase: Phase) {
-    if (phase.checklist?.idCh) {
-      this.router.navigate(['/causal-analysis', phase.checklist.idCh]);
-    } else {
-      console.error('Checklist ID is undefined.');
-    }
-  }
+ 
   deletePhase(id: number | undefined): void {
     if (id === undefined) {
         console.error("ID de phase non défini.");
