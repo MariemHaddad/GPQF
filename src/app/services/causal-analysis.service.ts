@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, throwError } from 'rxjs';
+import { catchError, Observable, switchMap, throwError } from 'rxjs';
 import { AnalyseCausale } from '../modules/analyseCausale';  // Corrigez le chemin du modèle
 import { PlanAction } from '../modules/planAction';
 
@@ -40,4 +40,15 @@ createActionPlan(planAction: PlanAction): Observable<PlanAction> {
         })
       );
   }
-}
+  updatePlan(planAction: PlanAction): Observable<any> {
+    console.log('Plan à mettre à jour:', planAction); // Log du plan d'action
+    
+    // Vérifiez que les actions sont envoyées comme tableau
+    return this.http.put(`http://localhost:8080/api/planAction/actions/update/${planAction.idPa}`, planAction.actions, { responseType: 'text' })
+    .pipe(
+        switchMap(() => 
+            this.http.put(`http://localhost:8080/api/planAction/update/${planAction.idPa}`, { leconTirees: planAction.leconTirees }, { responseType: 'text' })
+        )
+    );
+
+  }}

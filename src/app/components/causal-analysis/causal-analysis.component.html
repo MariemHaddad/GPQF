@@ -4,7 +4,16 @@
     background-color: #f9f9f9;
     border-radius: 8px;
   }
-
+  .btn-modifier {
+    background-color: #28a745; /* Couleur verte */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-bottom: 20px; /* Espacement en dessous du bouton */
+}
   .form-group {
     margin-bottom: 15px;
   }
@@ -222,7 +231,14 @@ margin-bottom: 20px;
 </div>
 
 <div *ngIf="planAction" class="action-plan-section">
-  <h2 class="analyse-title">Plan d'Action </h2>
+  <h2 class="analyse-title">Plan d'Action</h2>
+  <button (click)="editMode = !editMode" class="btn-modifier">
+    {{ editMode ? 'Annuler' : 'Modifier le Plan d\'Action' }}
+  </button>
+  <button class="btn-modifier" *ngIf="editMode" (click)="updateActionPlan()" style="margin-left: 10px;">
+    Enregistrer les Modifications
+  </button>
+
   <table class="analysis-table">
     <thead>
       <tr>  
@@ -239,15 +255,15 @@ margin-bottom: 20px;
     </thead>
     <tbody>
       <tr *ngFor="let action of planAction.actions">
-        <td><input [(ngModel)]="action.description" [attr.readonly]="!isRqualite ? true : null"></td>
-        <td><input [(ngModel)]="action.type" [attr.readonly]="!isRqualite ? true : null"></td>
-        <td><input [(ngModel)]="action.responsable" [attr.readonly]="!isRqualite ? true : null"></td>
-        <td><input type="date" [(ngModel)]="action.datePlanification" [attr.readonly]="!isRqualite ? true : null"></td>
-        <td><input type="date" [(ngModel)]="action.dateRealisation" [attr.readonly]="!isRqualite ? true : null"></td>
-        <td><input [(ngModel)]="action.critereEfficacite" [attr.readonly]="!isRqualite ? true : null"></td>
-        <td><input type="checkbox" [(ngModel)]="action.efficace" [disabled]="!isRqualite"></td>
-        <td><input [(ngModel)]="action.commentaire" [attr.readonly]="!isRqualite ? true : null"></td>
-        <td><input [(ngModel)]="planAction.leconTirees" [attr.readonly]="!isRqualite ? true : null"></td>
+        <td><input [(ngModel)]="action.description" [attr.readonly]="!editMode || !isRqualite ? true : null"></td>
+        <td><input [(ngModel)]="action.type" [attr.readonly]="!editMode || !isRqualite ? true : null"></td>
+        <td><input [(ngModel)]="action.responsable" [attr.readonly]="!editMode || !isRqualite ? true : null"></td>
+        <td><input type="date" [(ngModel)]="action.datePlanification" [attr.readonly]="!editMode || !isRqualite ? true : null"></td>
+        <td><input type="date" [(ngModel)]="action.dateRealisation" [attr.readonly]="!editMode || !isRqualite ? true : null"></td>
+        <td><input [(ngModel)]="action.critereEfficacite" [attr.readonly]="!editMode || !isRqualite ? true : null"></td>
+        <td><input type="checkbox" [(ngModel)]="action.efficace" [disabled]="!editMode || !isRqualite"></td>
+        <td><input [(ngModel)]="action.commentaire" [attr.readonly]="!editMode || !isRqualite ? true : null"></td>
+        <td><input [(ngModel)]="planAction.leconTirees" [attr.readonly]="!editMode || !isRqualite ? true : null"></td>
       </tr>
     </tbody>
   </table>

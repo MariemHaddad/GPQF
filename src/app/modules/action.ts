@@ -10,7 +10,7 @@ export class Action {
   critereEfficacite: string;
   efficace: boolean;
   commentaire: string;
-  planAction: PlanAction;
+ 
 
   constructor(
     id: number = 0,
@@ -22,7 +22,7 @@ export class Action {
     critereEfficacite: string = '',
     efficace: boolean = false,
     commentaire: string = '',
-    planAction: PlanAction = new PlanAction()
+
   ) {
     this.id = id;
     this.description = description;
@@ -33,6 +33,6 @@ export class Action {
     this.critereEfficacite = critereEfficacite;
     this.efficace = efficace;
     this.commentaire = commentaire;
-    this.planAction = planAction;
+   
   }
 }

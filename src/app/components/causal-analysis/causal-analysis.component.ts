@@ -22,7 +22,7 @@ export class CausalAnalysisComponent implements OnInit {
   isRqualite!: boolean; 
   loading: boolean = false;
   planAction: PlanAction | undefined;
-  
+  editMode: boolean = false;
   constructor(
     private route: ActivatedRoute,
     private causalAnalysisService: CausalAnalysisService,
@@ -44,7 +44,19 @@ export class CausalAnalysisComponent implements OnInit {
     });
 }
 
-
+updateActionPlan() {
+  if (this.planAction) {
+    this.causalAnalysisService.updatePlan(this.planAction).subscribe(
+      response => {
+        console.log('Plan d\'action mis à jour avec succès:', response);
+        this.loadActionPlan(); // Recharger les données après la mise à jour
+      },
+      error => {
+        console.error('Erreur lors de la mise à jour du plan d\'action:', error);
+      }
+    );
+  }
+}
 loadCausalAnalysis() {
   this.loading = true;
   if (this.checklistId !== undefined) {
@@ -73,7 +85,8 @@ loadActionPlan() {
     this.causalAnalysisService.getActionPlanByAnalysisId(this.analyseCausale.idAN).subscribe(
       plan => {
         this.planAction = plan;
-        this.cdr.detectChanges(); // Assurez-vous de mettre à jour l'UI
+        this.editMode = false; // Désactiver le mode édition après avoir chargé les données
+        this.cdr.detectChanges();
       },
       error => {
         console.error('Erreur lors du chargement du plan d\'action:', error);
