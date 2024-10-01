@@ -117,6 +117,196 @@ export class PhasesComponent implements OnInit {
     }
   }
 
+ 
+
+  addPhases() {
+    console.log('Phases to add before sending:', this.phasesToAdd); // Verify data
+
+    this.phaseService.addPhases(this.phasesToAdd, this.projetId).subscribe(
+        response => {
+            console.log('Server response:', response); // Confirm response
+            this.loadPhases(); // Reload phases
+            this.resetNouvellePhase(); // Reset form
+            this.phasesToAdd = []; // Clear list
+        },
+        error => {
+            console.error('Erreur lors de l\'ajout des phases:', error);
+            this.message = this.getErrorMessage(error);
+        }
+    );
+  }
+
+  addPhaseToList(phase: Phase) {
+    console.log('Adding phase to list:', phase);
+    this.phasesToAdd.push(phase);
+    console.log('Current phases to add:', this.phasesToAdd);
+  }
+
+  initializeChecklist(phaseId: number) {
+    this.checklistService.initializeChecklist(phaseId).subscribe(
+      checklist => {
+        console.log('Checklist initialisée:', checklist);
+        this.message = 'Checklist initialisée avec succès.';
+        this.loadPhases();
+      },
+      error => {
+        console.error('Erreur lors de l\'initialisation de la checklist:', error);
+        this.message = 'Erreur lors de l\'initialisation de la checklist.';
+      }
+    );
+  }
+
+  updateChecklistStatus(checklist: Checklist, status: string, remarque: string) {
+    if (checklist.idCh) {
+      this.checklistService.updateChecklistStatus(checklist.idCh, status, remarque).subscribe(
+        response => {
+          console.log('Statut de la checklist mis à jour:', response);
+          this.message = 'Statut de la checklist mis à jour avec succès.';
+          this.loadPhases();
+        },
+        error => {
+          console.error('Erreur lors de la mise à jour du statut de la checklist:', error);
+          this.message = 'Erreur lors de la mise à jour du statut de la checklist.';
+        }
+      );
+    } else {
+      console.error('Checklist ID is undefined.');
+    }
+  }
+
+  updateChecklistItems(checklist: Checklist) {
+    if (checklist.idCh) {
+      this.checklistService.updateChecklistItems(checklist.idCh, checklist.items).subscribe(
+        response => {
+          console.log('Items de la checklist mis à jour:', response);
+          this.message = 'Items de la checklist mis à jour avec succès.';
+          this.loadPhases();
+        },
+        error => {
+          console.error('Erreur lors de la mise à jour des items de la checklist:', error);
+          this.message = 'Erreur lors de la mise à jour des items de la checklist.';
+        }
+      );
+    } else {
+      console.error('Checklist ID is undefined.');
+    }
+  }
+
+  viewChecklist(phase: Phase) {
+    if (phase.idPh) {
+      this.router.navigate(['/checklists', phase.idPh], {
+        queryParams: { phaseDescription: phase.description, projectName: this.projetId }
+      });
+    } else {
+      console.error('Phase ID is undefined.');
+    }
+  }
+ 
+  deletePhase(id: number | undefined): void {
+    if (id === undefined) {
+        console.error("ID de phase non défini.");
+        return;
+    }
+
+    if (confirm("Êtes-vous sûr de vouloir supprimer cette phase ?")) {
+        this.phaseService.deletePhase(id).subscribe(
+            response => {
+                // Réaction après la suppression réussie
+                this.phases = this.phases.filter(phase => phase.idPh !== id);
+                this.message = response; // Utilisez la réponse texte directement
+                setTimeout(() => {
+                    this.loadPhases(); // Reload phases after a short delay
+                }, 2000); // Adjust delay as necessary
+            },
+            error => {
+                console.error("Erreur lors de la suppression de la phase :", error);
+                alert("Une erreur s'est produite lors de la suppression de la phase.");
+            }
+        );
+    }
+} 
+editPhase(phase: Phase) {
+  this.selectedPhase = { ...phase }; // Créez une copie de la phase à éditer
+  this.isEditMode = true;
+
+  // Initialisez le formulaire avec les anciennes valeurs, y compris effortActuel et effortPlanifie
+  this.editPhaseForm = new FormGroup({
+    description: new FormControl(this.selectedPhase?.description, [Validators.required]),
+    objectifs: new FormControl(this.selectedPhase?.objectifs),
+    plannedStartDate: new FormControl(this.selectedPhase?.plannedStartDate),
+    plannedEndDate: new FormControl(this.selectedPhase?.plannedEndDate),
+    effectiveStartDate: new FormControl(this.selectedPhase?.effectiveStartDate),
+    effectiveEndDate: new FormControl(this.selectedPhase?.effectiveEndDate),
+    effortActuel: new FormControl(this.selectedPhase?.effortActuel, [Validators.required]),
+    effortPlanifie: new FormControl(this.selectedPhase?.effortPlanifie, [Validators.required]),
+    etat: new FormControl(this.selectedPhase?.etat)
+  });}
+
+  savePhase() {
+    if (this.selectedPhase) {
+      console.log('Tentative de mise à jour de la phase...');
+      this.phaseService.updatePhase(this.selectedPhase).subscribe(
+        response => {
+          console.log('Phase mise à jour:', response);
+          this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+            this.router.navigate([`/phases/${this.projetId}`]);
+          });
+        },
+        error => {
+          console.error('Erreur lors de la mise à jour de la phase:', error);
+          this.message = 'Erreur lors de la mise à jour de la phase.';
+        }
+      );
+    }
+  }
+
+resetEditMode() {
+  this.selectedPhase = undefined; // Reset selected phase
+  this.isEditMode = false; // Reset edit mode
+  // Reset editPhaseForm if using Reactive Forms
+}
+
+getErrorMessage(error: any): string {
+  // Handle error messages based on error structure
+  return 'Une erreur s\'est produite.';
+}
+onSubmitEditPhase() {
+  if (this.editPhaseForm.valid && this.selectedPhase) {
+    console.log('Le formulaire est valide, mise à jour en cours...');
+    const updatedPhase: Phase = {
+      ...this.selectedPhase,
+      description: this.editPhaseForm.value.description,
+      objectifs: this.editPhaseForm.value.objectifs,
+      plannedStartDate: this.editPhaseForm.value.plannedStartDate,
+      plannedEndDate: this.editPhaseForm.value.plannedEndDate,
+      effectiveStartDate: this.editPhaseForm.value.effectiveStartDate,
+      effectiveEndDate: this.editPhaseForm.value.effectiveEndDate,
+      effortActuel: this.editPhaseForm.value.effortActuel,
+      effortPlanifie: this.editPhaseForm.value.effortPlanifie,
+      etat: this.editPhaseForm.value.etat
+    };
+    
+    this.phaseService.updatePhase(updatedPhase).subscribe(
+      response => {
+        console.log('Phase updated successfully', response);
+        this.isEditMode = false;
+        this.loadPhases(); // Reload phases after update
+      },
+      error => {
+        console.error('Error updating phase', error);
+      }
+    );
+  }
+}
+  private formatDate(dateString: string | undefined): string | undefined {
+    return dateString ? new Date(dateString).toISOString().split('T')[0] : undefined;
+  }
+  
+  private resetNouvellePhase() {
+    this.nouvellePhase = new Phase(
+      0, '', '', '', '', new Checklist(0, '', '', [], {} as Phase), '', '', 'EN_ATTENTE'
+    );
+  }
   loadVariances() {
     this.effortVariances = [];
     this.scheduleVariances = [];
@@ -244,190 +434,5 @@ export class PhasesComponent implements OnInit {
       });
     }, 500); // Delay to ensure proper rendering
   }
-
-  addPhases() {
-    console.log('Phases to add before sending:', this.phasesToAdd); // Verify data
-
-    this.phaseService.addPhases(this.phasesToAdd, this.projetId).subscribe(
-        response => {
-            console.log('Server response:', response); // Confirm response
-            this.loadPhases(); // Reload phases
-            this.resetNouvellePhase(); // Reset form
-            this.phasesToAdd = []; // Clear list
-        },
-        error => {
-            console.error('Erreur lors de l\'ajout des phases:', error);
-            this.message = this.getErrorMessage(error);
-        }
-    );
-  }
-
-  addPhaseToList(phase: Phase) {
-    console.log('Adding phase to list:', phase);
-    this.phasesToAdd.push(phase);
-    console.log('Current phases to add:', this.phasesToAdd);
-  }
-
-  initializeChecklist(phaseId: number) {
-    this.checklistService.initializeChecklist(phaseId).subscribe(
-      checklist => {
-        console.log('Checklist initialisée:', checklist);
-        this.message = 'Checklist initialisée avec succès.';
-        this.loadPhases();
-      },
-      error => {
-        console.error('Erreur lors de l\'initialisation de la checklist:', error);
-        this.message = 'Erreur lors de l\'initialisation de la checklist.';
-      }
-    );
-  }
-
-  updateChecklistStatus(checklist: Checklist, status: string, remarque: string) {
-    if (checklist.idCh) {
-      this.checklistService.updateChecklistStatus(checklist.idCh, status, remarque).subscribe(
-        response => {
-          console.log('Statut de la checklist mis à jour:', response);
-          this.message = 'Statut de la checklist mis à jour avec succès.';
-          this.loadPhases();
-        },
-        error => {
-          console.error('Erreur lors de la mise à jour du statut de la checklist:', error);
-          this.message = 'Erreur lors de la mise à jour du statut de la checklist.';
-        }
-      );
-    } else {
-      console.error('Checklist ID is undefined.');
-    }
-  }
-
-  updateChecklistItems(checklist: Checklist) {
-    if (checklist.idCh) {
-      this.checklistService.updateChecklistItems(checklist.idCh, checklist.items).subscribe(
-        response => {
-          console.log('Items de la checklist mis à jour:', response);
-          this.message = 'Items de la checklist mis à jour avec succès.';
-          this.loadPhases();
-        },
-        error => {
-          console.error('Erreur lors de la mise à jour des items de la checklist:', error);
-          this.message = 'Erreur lors de la mise à jour des items de la checklist.';
-        }
-      );
-    } else {
-      console.error('Checklist ID is undefined.');
-    }
-  }
-
-  viewChecklist(phase: Phase) {
-    if (phase.idPh) {
-      this.router.navigate(['/checklists', phase.idPh], {
-        queryParams: { phaseDescription: phase.description, projectName: this.projetId }
-      });
-    } else {
-      console.error('Phase ID is undefined.');
-    }
-  }
- 
-  deletePhase(id: number | undefined): void {
-    if (id === undefined) {
-        console.error("ID de phase non défini.");
-        return;
-    }
-
-    if (confirm("Êtes-vous sûr de vouloir supprimer cette phase ?")) {
-        this.phaseService.deletePhase(id).subscribe(
-            response => {
-                // Réaction après la suppression réussie
-                this.phases = this.phases.filter(phase => phase.idPh !== id);
-                this.message = response; // Utilisez la réponse texte directement
-                setTimeout(() => {
-                    this.loadPhases(); // Reload phases after a short delay
-                }, 2000); // Adjust delay as necessary
-            },
-            error => {
-                console.error("Erreur lors de la suppression de la phase :", error);
-                alert("Une erreur s'est produite lors de la suppression de la phase.");
-            }
-        );
-    }
-} 
-editPhase(phase: Phase) {
-  this.selectedPhase = { ...phase }; // Créez une copie de la phase à éditer
-  this.isEditMode = true;
-
-  // Initialisez le formulaire avec les anciennes valeurs, y compris effortActuel et effortPlanifie
-  this.editPhaseForm = new FormGroup({
-    description: new FormControl(this.selectedPhase?.description, [Validators.required]),
-    objectifs: new FormControl(this.selectedPhase?.objectifs),
-    plannedStartDate: new FormControl(this.selectedPhase?.plannedStartDate),
-    plannedEndDate: new FormControl(this.selectedPhase?.plannedEndDate),
-    effectiveStartDate: new FormControl(this.selectedPhase?.effectiveStartDate),
-    effectiveEndDate: new FormControl(this.selectedPhase?.effectiveEndDate),
-    effortActuel: new FormControl(this.selectedPhase?.effortActuel, [Validators.required]),
-    effortPlanifie: new FormControl(this.selectedPhase?.effortPlanifie, [Validators.required])
-  });}
-
-savePhase() {
-  if (this.selectedPhase) {
-    this.phaseService.updatePhase(this.selectedPhase).subscribe(
-      response => {
-        console.log('Phase mise à jour:', response);
-        this.loadPhases();
-        this.resetEditMode();
-      },
-      error => {
-        console.error('Erreur lors de la mise à jour de la phase:', error);
-        this.message = 'Erreur lors de la mise à jour de la phase.';
-      }
-    );
-  }
-}
-
-resetEditMode() {
-  this.selectedPhase = undefined; // Reset selected phase
-  this.isEditMode = false; // Reset edit mode
-  // Reset editPhaseForm if using Reactive Forms
-}
-
-getErrorMessage(error: any): string {
-  // Handle error messages based on error structure
-  return 'Une erreur s\'est produite.';
-}
-onSubmitEditPhase() {
-  if (this.editPhaseForm.valid && this.selectedPhase) {
-    const updatedPhase: Phase = {
-      ...this.selectedPhase,
-      description: this.editPhaseForm.value.description,
-      objectifs: this.editPhaseForm.value.objectifs,
-      plannedStartDate: this.editPhaseForm.value.plannedStartDate,
-      plannedEndDate: this.editPhaseForm.value.plannedEndDate,
-      effectiveStartDate: this.editPhaseForm.value.effectiveStartDate,
-      effectiveEndDate: this.editPhaseForm.value.effectiveEndDate,
-      effortActuel: this.editPhaseForm.value.effortActuel,
-      effortPlanifie: this.editPhaseForm.value.effortPlanifie
-    };
-    
-    this.phaseService.updatePhase(updatedPhase).subscribe(
-      response => {
-        console.log('Phase updated successfully', response);
-        this.isEditMode = false;
-        this.loadPhases(); // Reload phases after update
-      },
-      error => {
-        console.error('Error updating phase', error);
-      }
-    );
-  }
-}
-  private formatDate(dateString: string | undefined): string | undefined {
-    return dateString ? new Date(dateString).toISOString().split('T')[0] : undefined;
-  }
-  
-  private resetNouvellePhase() {
-    this.nouvellePhase = new Phase(
-      0, '', '', '', '', new Checklist(0, '', '', [], {} as Phase), '', '', 'EN_ATTENTE'
-    );
-  }
-
   
 }

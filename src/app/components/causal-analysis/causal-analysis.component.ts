@@ -4,7 +4,6 @@ import { Pourquoi } from 'src/app/modules/pourquoi';
 import { CausalAnalysisService } from 'src/app/services/causal-analysis.service';
 import { AnalyseCausale } from 'src/app/modules/analyseCausale';
 import { ActivatedRoute } from '@angular/router';
-import { Checklist } from 'src/app/modules/checklist';
 import { ChecklistService } from 'src/app/services/checklist.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { PlanAction } from 'src/app/modules/planAction';
@@ -23,6 +22,7 @@ export class CausalAnalysisComponent implements OnInit {
   loading: boolean = false;
   planAction: PlanAction | undefined;
   editMode: boolean = false;
+
   constructor(
     private route: ActivatedRoute,
     private causalAnalysisService: CausalAnalysisService,
@@ -34,66 +34,69 @@ export class CausalAnalysisComponent implements OnInit {
     this.isRqualite = this.authService.hasRole('RQUALITE');
 
     this.route.paramMap.subscribe(params => {
-        const id = params.get('checklistId');
-        this.checklistId = id ? +id : undefined;
-        if (this.checklistId && this.checklistId > 0) {
-            this.loadCausalAnalysis();
-        } else {
-            console.error('ID de checklist invalide:', this.checklistId);
-        }
+      const id = params.get('checklistId');
+      this.checklistId = id ? +id : undefined;
+      if (this.checklistId && this.checklistId > 0) {
+        this.loadCausalAnalysis();
+      } else {
+        console.error('ID de checklist invalide:', this.checklistId);
+      }
     });
-}
+  }
 
-updateActionPlan() {
-  if (this.planAction) {
-    this.causalAnalysisService.updatePlan(this.planAction).subscribe(
-      response => {
-        console.log('Plan d\'action mis à jour avec succès:', response);
-        this.loadActionPlan(); // Recharger les données après la mise à jour
-      },
-      error => {
-        console.error('Erreur lors de la mise à jour du plan d\'action:', error);
-      }
-    );
-  }
-}
-loadCausalAnalysis() {
-  this.loading = true;
-  if (this.checklistId !== undefined) {
-    this.causalAnalysisService.getCausalAnalysisByChecklistId(this.checklistId).subscribe(
-      analysis => {
-        if (analysis) {
-          this.analyseCausale = analysis;
-          this.savedAnalyseCausale = analysis;
-          console.log('Analyse causale chargée:', this.analyseCausale);
-          this.cdr.detectChanges(); // Force UI update
+  updateActionPlan() {
+    if (this.planAction) {
+      this.causalAnalysisService.updatePlan(this.planAction).subscribe(
+        response => {
+          console.log('Plan d\'action mis à jour avec succès:', response);
+          this.loadActionPlan(); // Recharger les données après la mise à jour
+        },
+        error => {
+          console.error('Erreur lors de la mise à jour du plan d\'action:', error);
         }
-        this.loadActionPlan();
-        this.loading = false;
-      },
-      error => {
-        console.error('Erreur lors du chargement de l\'analyse causale:', error);
-        this.loading = false;
-      }
-    );
-  } else {
-    console.error('ID de checklist invalide:', this.checklistId);
+      );
+    }
   }
-}
-loadActionPlan() {
-  if (this.analyseCausale && this.analyseCausale.idAN) {
-    this.causalAnalysisService.getActionPlanByAnalysisId(this.analyseCausale.idAN).subscribe(
-      plan => {
-        this.planAction = plan;
-        this.editMode = false; // Désactiver le mode édition après avoir chargé les données
-        this.cdr.detectChanges();
-      },
-      error => {
-        console.error('Erreur lors du chargement du plan d\'action:', error);
-      }
-    );
+
+  loadCausalAnalysis() {
+    this.loading = true;
+    if (this.checklistId !== undefined) {
+      this.causalAnalysisService.getCausalAnalysisByChecklistId(this.checklistId).subscribe(
+        analysis => {
+          if (analysis) {
+            this.analyseCausale = analysis;
+            this.savedAnalyseCausale = analysis;
+            console.log('Analyse causale chargée:', this.analyseCausale);
+            this.cdr.detectChanges(); // Force UI update
+          }
+          this.loadActionPlan();
+          this.loading = false;
+        },
+        error => {
+          console.error('Erreur lors du chargement de l\'analyse causale:', error);
+          this.loading = false;
+        }
+      );
+    } else {
+      console.error('ID de checklist invalide:', this.checklistId);
+    }
   }
-}
+
+  loadActionPlan() {
+    if (this.analyseCausale && this.analyseCausale.idAN) {
+      this.causalAnalysisService.getActionPlanByAnalysisId(this.analyseCausale.idAN).subscribe(
+        plan => {
+          this.planAction = plan;
+          this.editMode = false; // Désactiver le mode édition après avoir chargé les données
+          this.cdr.detectChanges();
+        },
+        error => {
+          console.error('Erreur lors du chargement du plan d\'action:', error);
+        }
+      );
+    }
+  }
+
   initializeAnalysis() {
     if (this.analyseCausale.methodeAnalyse === 'FIVE_WHYS') {
       this.analyseCausale.cinqPourquoi = [
@@ -106,14 +109,23 @@ loadActionPlan() {
     }
   }
 
-
   saveCausalAnalysis() {
     if (this.checklistId !== undefined) {
       this.causalAnalysisService.saveCausalAnalysis(this.analyseCausale, this.checklistId).subscribe(
         result => {
           this.savedAnalyseCausale = result;
-          this.createActionPlan(this.savedAnalyseCausale.idAN); // Assurez-vous de passer l'identifiant correct
-          this.loadActionPlan();  // Charger le plan d'action après la sauvegarde
+  
+          // Assurez-vous de bien mettre à jour l'analyse causale avec les "5 Whys" sauvegardés
+          if (this.analyseCausale.methodeAnalyse === 'FIVE_WHYS') {
+            this.analyseCausale.cinqPourquoi = result.cinqPourquoi;
+          }
+  
+          // Créer le plan d'action après la sauvegarde de l'analyse causale
+          console.log('Analyse Causale avant création du plan d\'action:', this.analyseCausale);
+          this.createActionPlan(this.savedAnalyseCausale.idAN); 
+  
+          // Charger le plan d'action pour vérifier les données
+          this.loadActionPlan();
           this.cdr.detectChanges(); // Mise à jour de l'UI
         },
         error => {
@@ -122,10 +134,20 @@ loadActionPlan() {
       );
     }
   }
+
   createActionPlan(analyseCausaleId: number) {
     const planAction: PlanAction = new PlanAction();
     planAction.leconTirees = "Leçons tirées de l'analyse";
-    planAction.analyseCausale = new AnalyseCausale(analyseCausaleId, '', '', '', 0, [], []); // Utilisez l'ID correct
+  
+    // Associer l'analyse causale sauvegardée au plan d'action
+    const analyseCausale = new AnalyseCausale(analyseCausaleId, '', '', '', 0, [], []);
+    planAction.analyseCausale = analyseCausale;
+  
+    // Vous pouvez accéder aux "5 Whys" via l'analyse causale lorsque nécessaire
+    if (this.analyseCausale.methodeAnalyse === 'FIVE_WHYS' && this.analyseCausale.cinqPourquoi) {
+      console.log('Ajout des 5 Whys via analyse causale:', this.analyseCausale.cinqPourquoi);
+      // Aucune copie directe dans planAction, juste la référence dans l'analyse causale
+    }
   
     this.causalAnalysisService.createActionPlan(planAction).subscribe(
       response => {
@@ -137,13 +159,13 @@ loadActionPlan() {
       }
     );
   }
-refreshData() {
-  this.loadCausalAnalysis();
-  this.loadActionPlan();
-  this.cdr.detectChanges(); // Detect changes after all data has loaded
-}
-  // Ajouter une méthode pour charger le plan d'action
- 
+
+  refreshData() {
+    this.loadCausalAnalysis();
+    this.loadActionPlan();
+    this.cdr.detectChanges(); // Detect changes after all data has loaded
+  }
+
   addCause() {
     if (this.isRqualite) {
       this.analyseCausale.causesIshikawa.push(new CauseIshikawa(0, '', '', 0, ''));
