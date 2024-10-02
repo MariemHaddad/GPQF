@@ -54,5 +54,12 @@ deletePhase(id: number): Observable<any> {
 updatePhase(phase: Phase) {
   return this.http.put<Phase>(`http://localhost:8080/api/phases/updatePhase/${phase.idPh}`, phase);
 }
+getTauxNCExterne(projetId: number): Observable<number> {
+  return this.http.get<number>(`${this.apiUrl}/projet/${projetId}/tauxNCExterne`);
+}
+
+getTauxNCInterne(projetId: number): Observable<number> {
+  return this.http.get<number>(`${this.apiUrl}/projet/${projetId}/tauxNCInterne`);
+}
 
 }

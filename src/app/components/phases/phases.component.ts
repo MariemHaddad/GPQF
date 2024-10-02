@@ -30,7 +30,10 @@ export class PhasesComponent implements OnInit {
   scheduleVariances: number[] = [];
   chartEffort: any;
   chartSchedule: any;
- 
+  internalNCRate: number = 0;  
+  externalNCRate: number = 0;
+  chartInternal: any;
+  chartExternal: any;
   constructor(
     private phaseService: PhaseService,
     private checklistService: ChecklistService,
@@ -62,6 +65,7 @@ export class PhasesComponent implements OnInit {
 
     // Initialize charts after loading data
     this.createCharts();
+    this.createNCCharts();
   }
  
   viewCausalAnalysis(phase: Phase) {
@@ -73,38 +77,50 @@ export class PhasesComponent implements OnInit {
   }
   loadPhases() {
     if (this.projetId) {
-      this.phaseService.getPhasesByProjet(this.projetId).subscribe(
-        phases => {
-          console.log('Phases reçues:', phases);
-          this.phases = phases.map(phase => ({
-            ...phase,
-            plannedStartDate: phase.plannedStartDate ? new Date(phase.plannedStartDate).toISOString().split('T')[0] : '',
-            plannedEndDate: phase.plannedEndDate ? new Date(phase.plannedEndDate).toISOString().split('T')[0] : '',
-            effectiveStartDate: phase.effectiveStartDate ? new Date(phase.effectiveStartDate).toISOString().split('T')[0] : undefined,
-            effectiveEndDate: phase.effectiveEndDate ? new Date(phase.effectiveEndDate).toISOString().split('T')[0] : undefined
-          }));
+        this.phaseService.getPhasesByProjet(this.projetId).subscribe(
+            phases => {
+                this.phases = phases.map(phase => ({
+                    ...phase,
+                    plannedStartDate: phase.plannedStartDate ? new Date(phase.plannedStartDate).toISOString().split('T')[0] : '',
+                    plannedEndDate: phase.plannedEndDate ? new Date(phase.plannedEndDate).toISOString().split('T')[0] : '',
+                    effectiveStartDate: phase.effectiveStartDate ? new Date(phase.effectiveStartDate).toISOString().split('T')[0] : undefined,
+                    effectiveEndDate: phase.effectiveEndDate ? new Date(phase.effectiveEndDate).toISOString().split('T')[0] : undefined
+                }));
 
-          // Load checklists for phases
-          this.phases.forEach(phase => {
-            if (phase.idPh) {
-              this.checklistService.getChecklistByPhase(phase.idPh).subscribe(
-                checklist => {
-                  phase.checklist = checklist;
-                },
-                error => {
-                  if (error.status === 404) {
-                    phase.checklist = null; // No checklist found
-                  } else {
-                    console.error('Erreur lors de la récupération de la checklist pour la phase:', error);
-                  }
-                }
-              );
-            }
-          });
+                // Chargez les checklists pour les phases
+                this.phases.forEach(phase => {
+                    if (phase.idPh) {
+                        this.checklistService.getChecklistByPhase(phase.idPh).subscribe(
+                            checklist => {
+                                phase.checklist = checklist;
+                            },
+                            error => {
+                                if (error.status === 404) {
+                                    phase.checklist = null; // Aucune checklist trouvée
+                                } else {
+                                    console.error('Erreur lors de la récupération de la checklist pour la phase:', error);
+                                }
+                            }
+                        );
+                    }
+                });
 
-          // Load variances
-          this.loadVariances();
+                this.calculateRates(); // Calculer les taux NC
 
+                // Récupérer les taux de NC externes et internes
+                this.phaseService.getTauxNCExterne(this.projetId).subscribe(rate => {
+                    this.externalNCRate = rate;
+                    this.createNCCharts(); // Créer les graphiques après récupération
+                });
+
+                this.phaseService.getTauxNCInterne(this.projetId).subscribe(rate => {
+                    this.internalNCRate = rate;
+                    this.createNCCharts(); // Créer les graphiques après récupération
+                });
+
+                
+           // Créer les graphiques NC après le calcul
+          this.loadVariances(); 
           if (this.phases.length === 0) {
             this.message = 'Aucune phase disponible pour ce projet.';
           }
@@ -116,7 +132,6 @@ export class PhasesComponent implements OnInit {
       );
     }
   }
-
  
 
   addPhases() {
@@ -239,7 +254,9 @@ editPhase(phase: Phase) {
     effectiveEndDate: new FormControl(this.selectedPhase?.effectiveEndDate),
     effortActuel: new FormControl(this.selectedPhase?.effortActuel, [Validators.required]),
     effortPlanifie: new FormControl(this.selectedPhase?.effortPlanifie, [Validators.required]),
-    etat: new FormControl(this.selectedPhase?.etat)
+    etat: new FormControl(this.selectedPhase?.etat),
+    statusLivraisonInterne: new FormControl(this.selectedPhase?.statusLivraisonInterne),
+    statusLivraisonExterne: new FormControl(this.selectedPhase?.statusLivraisonExterne)
   });}
 
   savePhase() {
@@ -283,7 +300,9 @@ onSubmitEditPhase() {
       effectiveEndDate: this.editPhaseForm.value.effectiveEndDate,
       effortActuel: this.editPhaseForm.value.effortActuel,
       effortPlanifie: this.editPhaseForm.value.effortPlanifie,
-      etat: this.editPhaseForm.value.etat
+      etat: this.editPhaseForm.value.etat,
+      statusLivraisonInterne: this.editPhaseForm.value.statusLivraisonInterne,
+      statusLivraisonExterne: this.editPhaseForm.value.statusLivraisonExterne
     };
     
     this.phaseService.updatePhase(updatedPhase).subscribe(
@@ -435,4 +454,89 @@ onSubmitEditPhase() {
     }, 500); // Delay to ensure proper rendering
   }
   
+
+  createNCCharts() {
+    // Ensure internal and external rates are calculated before creating charts
+    this.calculateRates();
+
+    // Check if the internalNCRate and externalNCRate are valid
+    if (this.internalNCRate == null || this.externalNCRate == null) {
+        console.error('Invalid NCRates:', { internalNCRate: this.internalNCRate, externalNCRate: this.externalNCRate });
+        return; // Early return to avoid errors
+    }
+
+    // Créez le graphique interne
+    this.chartInternal = new Chart('chartInternal', {
+        type: 'bar', // ou le type de graphique que vous souhaitez
+        data: {
+            labels: ['Project'], // Remplacez par vos labels
+            datasets: [{
+                label: 'NC Interne',
+                data: [this.internalNCRate], // Remplacez par vos données réelles
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                datalabels: {
+                    display: true,
+                    align: 'end',
+                    anchor: 'end'
+                }
+            }
+        }
+    });
+
+    // Créez le graphique externe
+    this.chartExternal = new Chart('chartExternal', {
+        type: 'bar',
+        data: {
+            labels: ['Project'], // Remplacez par vos labels
+            datasets: [{
+                label: 'NC Externe',
+                data: [this.externalNCRate], // Remplacez par vos données réelles
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                datalabels: {
+                    display: true,
+                    align: 'end',
+                    anchor: 'end'
+                }
+            }
+        }
+    });
+}
+
+calculateRates() {
+    let internalCount = 0;
+    let externalCount = 0;
+    const totalCount = this.phases.length;
+
+    if (totalCount === 0) {
+        this.internalNCRate = 0;
+        this.externalNCRate = 0;
+        return; // Early return if there are no phases
+    }
+
+    this.phases.forEach(phase => {
+      if (phase.statusLivraisonInterne === 'NC') {
+          internalCount++;
+      }
+      if (phase.statusLivraisonExterne === 'NC') {
+          externalCount++;
+      }
+  });
+
+  this.internalNCRate = (internalCount / totalCount) * 100;
+  this.externalNCRate = (externalCount / totalCount) * 100;
+}
 }

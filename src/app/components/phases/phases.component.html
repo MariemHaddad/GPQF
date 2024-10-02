@@ -375,8 +375,16 @@ text-decoration: underline; /* Souligne le texte lorsque la classe hovered est a
                   
                     <!-- Graphiques des variances -->
                     <div class="chart-container">
-                      <canvas id="effortChart"></canvas>
-                      <canvas id="scheduleChart"></canvas>
+                        <canvas id="effortChart"></canvas>
+                        <canvas id="scheduleChart"></canvas>
+                        <canvas id="chartInternal"></canvas>
+                        <canvas id="chartExternal"></canvas>
+                    </div>
+                    <!-- Graphiques des variances -->
+                    <div class="charts-container">
+                      
+                        <canvas id="chartInternal"></canvas>
+                        <canvas id="chartExternal"></canvas>
                     </div>
                     <h2>Phases du projet</h2>
                     <h3 class="text-center mt-4 mb-4">Liste des Phases du Projet</h3>
@@ -390,8 +398,11 @@ text-decoration: underline; /* Souligne le texte lorsque la classe hovered est a
                             <th>État</th>
                             <th>Effort Actuel</th>
                             <th>Effort Planifié</th>
+                            <th>Status de condormité interne</th>
+                            <th>Status de conformité externe</th>
                             <th>Revue</th>
                             <th>Analyse Causale</th>
+                            
                           </tr>
                         </thead>
                         <tbody>
@@ -411,7 +422,24 @@ text-decoration: underline; /* Souligne le texte lorsque la classe hovered est a
                             </td>
                             <td>{{ phase.effortActuel || 'N/A' }} jours</td>
                             <td>{{ phase.effortPlanifie || 'N/A' }} jours</td>
-                           
+                            <td>
+                                <span [ngClass]="{
+                                  'badge badge-success': phase.statusLivraisonInterne=== 'C',
+                                  'badge badge-warning': phase.statusLivraisonInterne === 'NC'
+                               
+                                }">
+                                  {{ phase.statusLivraisonInterne }}
+                                </span>
+                              </td>
+                              <td>
+                                <span [ngClass]="{
+                                  'badge badge-success': phase.statusLivraisonExterne === 'C',
+                                  'badge badge-warning': phase.statusLivraisonExterne === 'NC'
+                               
+                                }">
+                                  {{ phase.statusLivraisonExterne }}
+                                </span>
+                              </td>
                 
                             <td>
                             <button class="btn btn-outline-info btn-sm" (click)="viewChecklist(phase)">Afficher Checklist</button>
@@ -474,6 +502,20 @@ text-decoration: underline; /* Souligne le texte lorsque la classe hovered est a
                                 <option value="EN_COURS">En Cours</option>
                                 <option value="TERMINE"> Terminé</option>
                                 
+                            </select>
+                          </div>
+                          <div class="form-group">
+                            <label for="statusLivraisonInterne">Status de condormité interne</label>
+                            <select formControlName="statusLivraisonInterne" class="form-control" id="statusLivraisonInterne" required>
+                                <option value="C">C</option>
+                                <option value="NC">NC</option>
+                            </select>
+                          </div>
+                          <div class="form-group">
+                            <label for="statusLivraisonExterne">Status de condormité externe</label>
+                            <select formControlName="statusLivraisonExterne" class="form-control" id="statusLivraisonExterne" required>
+                                <option value="C">C</option>
+                                <option value="NC">NC</option>
                             </select>
                           </div>
                           <button type="submit" class="btn btn-primary">Enregistrer</button>

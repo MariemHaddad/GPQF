@@ -5,7 +5,8 @@ import { ProjetService } from 'src/app/services/projet.service';
 import { Projet } from 'src/app/modules/projet';  
 import { Activite } from 'src/app/modules/activite';
 import { User } from 'src/app/modules/user';
-
+import { Chart } from 'chart.js'; 
+import { TauxNCData } from 'src/app/modules/taux-nc-data.model';
 @Component({
   selector: 'app-projects',
   templateUrl: './projects.component.html',
@@ -24,7 +25,7 @@ export class ProjectsComponent implements OnInit {
   activites: Activite[] = [];
   chefsDeProjet: User[] = [];
   responsablesQualite: User[] = [];
-
+  private chartNC: Chart | undefined; 
   constructor(
     private route: ActivatedRoute,
     private router: Router, // Ajoutez Router au constructeur
@@ -35,19 +36,22 @@ export class ProjectsComponent implements OnInit {
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      this.activiteId = +id;
-      this.loadProjets();
-      this.loadChefsDeProjet();
-      this.loadResponsablesQualite();
+        this.activiteId = +id;
+        this.loadProjets();
+        this.loadChefsDeProjet();
+        this.loadResponsablesQualite();
+        this.loadTauxNCData(); // Chargez les données pour le graphique ici
 
-      // Ici, vous pouvez vérifier le rôle de l'utilisateur
-      // et définir la variable isDirecteur en conséquence
-      // Exemple simple pour illustration :
-      const roleUtilisateur = localStorage.getItem('role'); // Ou toute autre méthode pour obtenir le rôle de l'utilisateur
-      this.isDirecteur = roleUtilisateur === 'DIRECTEUR';
+        const roleUtilisateur = localStorage.getItem('role');
+        this.isDirecteur = roleUtilisateur === 'DIRECTEUR';
     }
-  }
+}
 
+loadTauxNCData(): void {
+    this.projetService.getTauxNCData(this.activiteId).subscribe((data: TauxNCData[]) => {
+        this.createNCCharts(data); // Créez le graphique après avoir chargé les données
+    });
+}
   loadChefsDeProjet(): void {
     this.projetService.getChefsDeProjet().subscribe((data: User[]) => {
       this.chefsDeProjet = data;
@@ -104,6 +108,76 @@ export class ProjectsComponent implements OnInit {
       }
     );
   }
+  createNCCharts(tauxNCData: TauxNCData[]): void {
+    // Assurez-vous que les données existent
+    if (!tauxNCData || tauxNCData.length === 0) {
+        console.error('No data available for charts');
+        return;
+    }
+
+    // Extraire les taux
+    const projets = tauxNCData.map(data => data.projetNom); // Noms des projets
+    const tauxNCInterne = tauxNCData.map(data => data.tauxNCInterne); // Taux NC internes
+    const tauxNCExterne = tauxNCData.map(data => data.tauxNCExterne); // Taux NC externes
+
+    // Détruire le graphique précédent s'il existe
+    if (this.chartNC) {
+        this.chartNC.destroy();
+    }
+
+    // Créer le graphique avec Chart.js
+    this.chartNC = new Chart('chartNC', {
+        type: 'line', // Type de graphique
+        data: {
+            labels: projets, // Noms des projets en tant que labels sur l'axe des x
+            datasets: [
+                {
+                    label: 'Taux NC Internes',
+                    data: tauxNCInterne,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 2,
+                    fill: false // Ne pas remplir sous la courbe
+                },
+                {
+                    label: 'Taux NC Externes',
+                    data: tauxNCExterne,
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 2,
+                    fill: false // Ne pas remplir sous la courbe
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true, // Commencer l'axe Y à 0
+                    title: {
+                        display: true,
+                        text: 'Taux de Non-Conformités (%)' // Titre de l'axe Y
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Projets' // Titre de l'axe X
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true, // Afficher la légende
+                    position: 'top', // Position de la légende
+                },
+                tooltip: {
+                    mode: 'index', // Affiche le tooltip pour plusieurs courbes
+                }
+            }
+        }
+    });
+}
   loadActivites(): void {
     this.activiteService.getActivites().subscribe((data: Activite[]) => {
       this.activites = data;

@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Projet } from 'src/app/modules/projet';
 import { User } from '../modules/user';
+import { TauxNCData } from '../modules/taux-nc-data.model';
 
 @Injectable({
   providedIn: 'root'
@@ -43,4 +44,7 @@ export class ProjetService {  private baseUrl = 'http://localhost:8080/api/proje
 
     return this.http.post(`${this.baseUrl}/ajouter`, projet, options);
   }
+  getTauxNCData(activiteId: number): Observable<TauxNCData[]> {
+    return this.http.get<TauxNCData[]>(`${this.baseUrl}/activite/${activiteId}/tauxNC`);
+}
 }

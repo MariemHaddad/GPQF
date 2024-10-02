@@ -14,6 +14,10 @@ export class Phase {
     checklist: Checklist | null;
     effortVariance?: number; 
     scheduleVariance?: number;
+    statusLivraisonInterne: 'C' | 'NC';
+    statusLivraisonExterne: 'C' | 'NC';
+    internalNCRate?: number;
+    externalNCRate?:number;
     constructor(
         idPh: number,
         description: string,
@@ -27,7 +31,11 @@ export class Phase {
         effortPlanifie?: number, // Ajouté
         effortActuel?: number,
         effortVariance?: number, // Ajoute cette propriété
-  scheduleVariance?: number
+        scheduleVariance?: number,
+        statusLivraisonInterne: 'C' | 'NC' = 'C',
+        statusLivraisonExterne: 'C' | 'NC' = 'C',
+        internalNCRate?: number,
+        externalNCRate?:number
     ) {
         this.idPh = idPh;
         this.description = description;
@@ -41,6 +49,9 @@ export class Phase {
         this.effortActuel= effortActuel;
         this.checklist = checklist;
         this.effortVariance= effortVariance;
+        this.statusLivraisonInterne = statusLivraisonInterne;
+        this.statusLivraisonExterne = statusLivraisonExterne;
+        this.externalNCRate = externalNCRate;
+        this.internalNCRate = internalNCRate;
         this.scheduleVariance = scheduleVariance;
-    }
-}
+    }}
