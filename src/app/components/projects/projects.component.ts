@@ -7,6 +7,7 @@ import { Activite } from 'src/app/modules/activite';
 import { User } from 'src/app/modules/user';
 import { Chart } from 'chart.js'; 
 import { TauxNCData } from 'src/app/modules/taux-nc-data.model';
+import { TauxNCSemestrielResponse } from 'src/app/modules/taux-nc-semestriel-response.model';
 @Component({
   selector: 'app-projects',
   templateUrl: './projects.component.html',
@@ -26,6 +27,9 @@ export class ProjectsComponent implements OnInit {
   chefsDeProjet: User[] = [];
   responsablesQualite: User[] = [];
   private chartNC: Chart | undefined; 
+  private chartNCS: Chart | undefined; 
+  tauxNCSemestriels: TauxNCSemestrielResponse[] = [];
+  
   constructor(
     private route: ActivatedRoute,
     private router: Router, // Ajoutez Router au constructeur
@@ -40,11 +44,60 @@ export class ProjectsComponent implements OnInit {
         this.loadProjets();
         this.loadChefsDeProjet();
         this.loadResponsablesQualite();
-        this.loadTauxNCData(); // Chargez les données pour le graphique ici
+        this.loadTauxNCData(); 
+        this.loadTauxNCSemestriels(); // Chargez les données pour le graphique ici
 
         const roleUtilisateur = localStorage.getItem('role');
         this.isDirecteur = roleUtilisateur === 'DIRECTEUR';
     }
+}
+loadTauxNCSemestriels(): void {
+  const activiteId = this.activiteId; // Utilisez l'ID d'activité existant
+  this.projetService.getTauxNCSemestriels(activiteId).subscribe((data: TauxNCSemestrielResponse[]) => {
+    this.tauxNCSemestriels = data; // Stockez les données semestrielles
+    this.createSemestrialChart(); // Créez le graphique après avoir chargé les données
+  });
+}  createSemestrialChart(): void {
+  const semestres = this.tauxNCSemestriels.map((item) => item.semestre);
+  const tauxNCInterne = this.tauxNCSemestriels.map((item) => item.tauxNCInterne);
+  const tauxNCExterne = this.tauxNCSemestriels.map((item) => item.tauxNCExterne);
+
+  // Détruire le graphique précédent s'il existe
+  if (this.chartNCS) {
+      this.chartNCS.destroy();
+  }
+
+  // Créer le graphique avec Chart.js
+  this.chartNCS = new Chart('chartNCS', {
+      type: 'line', // Type de graphique
+      data: {
+          labels: semestres,
+          datasets: [
+              {
+                  label: 'Taux NC Interne',
+                  data: tauxNCInterne,
+                  borderColor: 'rgba(75, 192, 192, 1)',
+                  backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                  fill: true,
+              },
+              {
+                  label: 'Taux NC Externe',
+                  data: tauxNCExterne,
+                  borderColor: 'rgba(255, 99, 132, 1)',
+                  backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                  fill: true,
+              },
+          ],
+      },
+      options: {
+          responsive: true,
+          scales: {
+              y: {
+                  beginAtZero: true,
+              },
+          },
+      },
+  });
 }
 
 loadTauxNCData(): void {

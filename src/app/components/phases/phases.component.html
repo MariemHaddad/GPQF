@@ -425,7 +425,7 @@ text-decoration: underline; /* Souligne le texte lorsque la classe hovered est a
                             <td>
                                 <span [ngClass]="{
                                   'badge badge-success': phase.statusLivraisonInterne=== 'C',
-                                  'badge badge-warning': phase.statusLivraisonInterne === 'NC'
+                                  'badge badge-danger': phase.statusLivraisonInterne === 'NC'
                                
                                 }">
                                   {{ phase.statusLivraisonInterne }}
@@ -434,7 +434,7 @@ text-decoration: underline; /* Souligne le texte lorsque la classe hovered est a
                               <td>
                                 <span [ngClass]="{
                                   'badge badge-success': phase.statusLivraisonExterne === 'C',
-                                  'badge badge-warning': phase.statusLivraisonExterne === 'NC'
+                                  'badge badge-danger': phase.statusLivraisonExterne === 'NC'
                                
                                 }">
                                   {{ phase.statusLivraisonExterne }}
@@ -521,6 +521,7 @@ text-decoration: underline; /* Souligne le texte lorsque la classe hovered est a
                           <button type="submit" class="btn btn-primary">Enregistrer</button>
                         </form>
                     
+                    </div>
                     </div>
                     <button (click)="showForm = !showForm" class="btn btn-primary btn-user btn-block">
                       {{ showForm ? 'Masquer le formulaire' : 'Ajouter des phases' }}

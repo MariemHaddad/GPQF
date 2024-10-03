@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { Projet } from 'src/app/modules/projet';
 import { User } from '../modules/user';
 import { TauxNCData } from '../modules/taux-nc-data.model';
+import { TauxNCSemestrielResponse } from '../modules/taux-nc-semestriel-response.model';
 
 @Injectable({
   providedIn: 'root'
@@ -46,5 +47,8 @@ export class ProjetService {  private baseUrl = 'http://localhost:8080/api/proje
   }
   getTauxNCData(activiteId: number): Observable<TauxNCData[]> {
     return this.http.get<TauxNCData[]>(`${this.baseUrl}/activite/${activiteId}/tauxNC`);
+}
+getTauxNCSemestriels(activiteId: number): Observable<TauxNCSemestrielResponse[]> {
+  return this.http.get<TauxNCSemestrielResponse[]>(`${this.baseUrl}/activite/${activiteId}/tauxNCSemestriels`);
 }
 }
