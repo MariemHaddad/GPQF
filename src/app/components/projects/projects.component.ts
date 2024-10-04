@@ -8,6 +8,7 @@ import { User } from 'src/app/modules/user';
 import { Chart } from 'chart.js'; 
 import { TauxNCData } from 'src/app/modules/taux-nc-data.model';
 import { TauxNCSemestrielResponse } from 'src/app/modules/taux-nc-semestriel-response.model';
+import { SatisfactionDataDTO } from 'src/app/modules/satisfaction-data.model';
 @Component({
   selector: 'app-projects',
   templateUrl: './projects.component.html',
@@ -29,7 +30,12 @@ export class ProjectsComponent implements OnInit {
   private chartNC: Chart | undefined; 
   private chartNCS: Chart | undefined; 
   tauxNCSemestriels: TauxNCSemestrielResponse[] = [];
-  
+  private chartSatisfaction: Chart | undefined; 
+  showEditModal: boolean = false;
+projetSelectionne: Projet = new Projet();
+showDeleteModal: boolean = false;
+projetASupprimer: Projet = new Projet();
+showPopup: boolean = false; 
   constructor(
     private route: ActivatedRoute,
     private router: Router, // Ajoutez Router au constructeur
@@ -45,11 +51,61 @@ export class ProjectsComponent implements OnInit {
         this.loadChefsDeProjet();
         this.loadResponsablesQualite();
         this.loadTauxNCData(); 
-        this.loadTauxNCSemestriels(); // Chargez les données pour le graphique ici
+        this.loadTauxNCSemestriels(); 
+        this.loadSatisfactionData(); // Chargez les données pour le graphique ici
 
         const roleUtilisateur = localStorage.getItem('role');
         this.isDirecteur = roleUtilisateur === 'DIRECTEUR';
     }
+}
+ouvrirModalModification(projet: Projet): void {
+  this.projetSelectionne = { ...projet }; // Clonez l'objet pour ne pas modifier directement
+  this.showEditModal = true;
+  this.showDeleteModal = false; // Ferme le modal de suppression s'il était ouvert
+}
+
+confirmerSuppression(projet: Projet): void {
+  this.projetASupprimer = projet;
+  this.showDeleteModal = true;
+  this.showEditModal = false; // Ferme le modal de modification s'il était ouvert
+}
+
+fermerModalSuppression(): void {
+  this.showDeleteModal = false;
+}
+
+fermerModal(): void {
+  this.showEditModal = false;
+}
+modifierProjet(): void {
+  console.log('Modification en cours pour le projet:', this.projetSelectionne);
+  this.projetService.modifierProjet(this.projetSelectionne.idP, this.projetSelectionne)
+    .subscribe({
+      next: (response) => {
+        console.log('Réponse de la modification:', response);
+        alert('Projet modifié avec succès');
+        this.showEditModal = false;
+        this.loadProjets(); // Recharger les projets après modification
+      },
+      error: (error)=> {console.error('Erreur lors de la modification du projet:', error);}
+    });
+}
+
+supprimerProjet(): void {
+  console.log('Suppression en cours pour le projet ID:', this.projetASupprimer.idP);
+  this.projetService.supprimerProjet(this.projetASupprimer.idP)
+    .subscribe({
+      next: (response) => {
+        console.log('Réponse de la suppression:', response);
+        alert('Projet supprimé avec succès');
+        this.showDeleteModal = false;
+        this.loadProjets(); // Recharger les projets après suppression
+      },
+      error: (error) => {
+        console.error('Erreur lors de la suppression du projet:', error);
+        alert('Erreur lors de la suppression du projet');
+      }
+    });
 }
 loadTauxNCSemestriels(): void {
   const activiteId = this.activiteId; // Utilisez l'ID d'activité existant
@@ -148,6 +204,7 @@ loadTauxNCData(): void {
       typeprojet: this.nouveauProjet.typeprojet,
       responsableQualiteNom: this.responsableQualiteNom,
       chefDeProjetNom: this.chefDeProjetNom
+
     };
 
     // Appelez le service pour ajouter le projet
@@ -239,4 +296,70 @@ loadTauxNCData(): void {
   viewPhases(projetId: number): void {
     this.router.navigate([`/projects/${projetId}/phases`]);
   }
-}
+  loadSatisfactionData(): void {
+    this.projetService.getSatisfactionData(this.activiteId).subscribe((data: SatisfactionDataDTO[]) => {
+      this.createSatisfactionChart(data); // Créez le graphique après avoir chargé les données
+    });
+  }
+createSatisfactionChart(satisfactionData: SatisfactionDataDTO[]): void {
+  // Extraire les semestres et les valeurs SI1 et SI2
+  const semestres = satisfactionData.map(data => data.semester);
+  const si1Values = satisfactionData.map(data => data.si1Value);
+  const si2Values = satisfactionData.map(data => data.si2Value);
+
+  // Détruire le graphique précédent s'il existe
+  if (this.chartSatisfaction) {
+    this.chartSatisfaction.destroy();
+  }
+
+  // Créer le graphique avec Chart.js
+  this.chartSatisfaction = new Chart('chartSatisfaction', {
+    type: 'line', // Type de graphique
+    data: {
+      labels: semestres,
+      datasets: [
+        {
+          label: 'Valeur SI1',
+          data: si1Values,
+          borderColor: 'rgba(255, 165, 0, 1)', // Orange
+          backgroundColor: 'rgba(255, 165, 0, 0.2)', // Orange
+          fill: true,
+        },
+        {
+          label: 'Valeur SI2',
+          data: si2Values,
+          borderColor: 'rgba(0, 128, 0, 1)', // Vert
+          backgroundColor: 'rgba(0, 128, 0, 0.2)', // Vert
+          fill: true,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Valeurs SI1 / SI2',
+          },
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'Semestres',
+          },
+        },
+      },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+        },
+        tooltip: {
+          mode: 'index',
+        },
+      },
+    },
+  });
+}}

@@ -5,6 +5,7 @@ import { Projet } from 'src/app/modules/projet';
 import { User } from '../modules/user';
 import { TauxNCData } from '../modules/taux-nc-data.model';
 import { TauxNCSemestrielResponse } from '../modules/taux-nc-semestriel-response.model';
+import { SatisfactionDataDTO } from '../modules/satisfaction-data.model';
 
 @Injectable({
   providedIn: 'root'
@@ -51,4 +52,16 @@ export class ProjetService {  private baseUrl = 'http://localhost:8080/api/proje
 getTauxNCSemestriels(activiteId: number): Observable<TauxNCSemestrielResponse[]> {
   return this.http.get<TauxNCSemestrielResponse[]>(`${this.baseUrl}/activite/${activiteId}/tauxNCSemestriels`);
 }
+getSatisfactionData(activiteId: number): Observable<SatisfactionDataDTO[]> {
+  return this.http.get<SatisfactionDataDTO[]>(`${this.baseUrl}/satisfaction/${activiteId}`);
+}
+modifierProjet(projetId: number, projet: Projet): Observable<any> {
+  return this.http.put(`${this.baseUrl}/modifier/${projetId}`, projet, {
+    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+  });
+}
+supprimerProjet(projetId: number): Observable<any> {
+  return this.http.delete(`${this.baseUrl}/supprimer/${projetId}`);
+}
+
 }

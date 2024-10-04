@@ -6,14 +6,42 @@
       margin-top: -150px;
       h2 {
   cursor: pointer; /* Change le curseur en pointeur pour indiquer qu'il est cliquable */
+}.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* Valeur très élevée pour le pop-up */
 }
+.custom-container{
+    position: center;
+    margin-left: 5000px;
+
+   
+  
+}
+
+.popup-content {
+  background: white; /* Couleur de fond du contenu du pop-up */
+  padding: 20px; /* Ajoutez un peu d'espacement */
+  border-radius: 5px; /* Coins arrondis */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Ombre pour donner de la profondeur */
+}
+
 .add-project-header {
   color: #003366; /* Bleu marine */
   font-size: 1.2em; /* Taille un peu plus petite */
   text-align: right; /* Aligner à droite */
   cursor: pointer; /* Pour indiquer qu'il est cliquable */
 }
-
+.main-interface {
+  z-index: 1; /* Ou pas de z-index */
+}
 .add-project-header.hovered {
   text-decoration: underline; /* Facultatif : effet lors du survol */
 }
@@ -141,11 +169,7 @@ h2.hovered {
             </div>
       
             <!-- Sidebar Message -->
-            <div class="sidebar-card d-none d-lg-flex">
-                <img class="sidebar-card-illustration mb-2" src="assets/img/undraw_rocket.svg" alt="...">
-                <p class="text-center mb-2"><strong>SB Admin Pro</strong> is packed with premium features, components, and more!</p>
-                <a class="btn btn-success btn-sm" href="https://startbootstrap.com/theme/sb-admin-pro">Upgrade to Pro!</a>
-            </div>
+           
       
         </ul>
         <!-- End of Sidebar -->
@@ -163,167 +187,17 @@ h2.hovered {
                     <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
                         <i class="fa fa-bars"></i>
                     </button>
-      
+                    <div class="container custom-container">
                     <!-- Topbar Search -->
-                    <form
-                        class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-                        <div class="input-group">
-                            <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
-                                aria-label="Search" aria-describedby="basic-addon2">
-                            <div class="input-group-append">
-                                <button class="btn btn-primary" type="button">
-                                    <i class="fas fa-search fa-sm"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-      
+                    <div class="text-center">
+                        <img src="assets/img/Telnet.png" alt="Telnet Logo" class="center" style="width: 200px; height: auto;">
+                      </div>
+                    </div>
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
       
-                        <!-- Nav Item - Search Dropdown (Visible Only XS) -->
-                        <li class="nav-item dropdown no-arrow d-sm-none">
-                            <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-search fa-fw"></i>
-                            </a>
-                            <!-- Dropdown - Messages -->
-                            <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
-                                aria-labelledby="searchDropdown">
-                                <form class="form-inline mr-auto w-100 navbar-search">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control bg-light border-0 small"
-                                            placeholder="Search for..." aria-label="Search"
-                                            aria-describedby="basic-addon2">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-primary" type="button">
-                                                <i class="fas fa-search fa-sm"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </li>
       
-                        <!-- Nav Item - Alerts -->
-                        <li class="nav-item dropdown no-arrow mx-1">
-                            <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-bell fa-fw"></i>
-                                <!-- Counter - Alerts -->
-                                <span class="badge badge-danger badge-counter">3+</span>
-                            </a>
-                            <!-- Dropdown - Alerts -->
-                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                aria-labelledby="alertsDropdown">
-                                <h6 class="dropdown-header">
-                                    Alerts Center
-                                </h6>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-primary">
-                                            <i class="fas fa-file-alt text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 12, 2019</div>
-                                        <span class="font-weight-bold">A new monthly report is ready to download!</span>
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-success">
-                                            <i class="fas fa-donate text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 7, 2019</div>
-                                        $290.29 has been deposited into your account!
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-warning">
-                                            <i class="fas fa-exclamation-triangle text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 2, 2019</div>
-                                        Spending Alert: We've noticed unusually high spending for your account.
-                                    </div>
-                                </a>
-                                <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
-                            </div>
-                        </li>
-      
-                        <!-- Nav Item - Messages -->
-                        <li class="nav-item dropdown no-arrow mx-1">
-                            <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-envelope fa-fw"></i>
-                                <!-- Counter - Messages -->
-                                <span class="badge badge-danger badge-counter">7</span>
-                            </a>
-                            <!-- Dropdown - Messages -->
-                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                aria-labelledby="messagesDropdown">
-                                <h6 class="dropdown-header">
-                                    Message Center
-                                </h6>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="dropdown-list-image mr-3">
-                                        <img class="rounded-circle" src="assets/img/undraw_profile_1.svg"
-                                            alt="...">
-                                        <div class="status-indicator bg-success"></div>
-                                    </div>
-                                    <div class="font-weight-bold">
-                                        <div class="text-truncate">Hi there! I am wondering if you can help me with a
-                                            problem I've been having.</div>
-                                        <div class="small text-gray-500">Emily Fowler · 58m</div>
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="dropdown-list-image mr-3">
-                                        <img class="rounded-circle" src="assets/img/undraw_profile_2.svg"
-                                            alt="...">
-                                        <div class="status-indicator"></div>
-                                    </div>
-                                    <div>
-                                        <div class="text-truncate">I have the photos that you ordered last month, how
-                                            would you like them sent to you?</div>
-                                        <div class="small text-gray-500">Jae Chun · 1d</div>
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="dropdown-list-image mr-3">
-                                        <img class="rounded-circle" src="assets/img/undraw_profile_3.svg"
-                                            alt="...">
-                                        <div class="status-indicator bg-warning"></div>
-                                    </div>
-                                    <div>
-                                        <div class="text-truncate">Last month's report looks great, I am very happy with
-                                            the progress so far, keep up the good work!</div>
-                                        <div class="small text-gray-500">Morgan Alvarez · 2d</div>
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="dropdown-list-image mr-3">
-                                        <img class="rounded-circle" src="https://source.unsplash.com/Mv9hjnEUHR4/60x60"
-                                            alt="...">
-                                        <div class="status-indicator bg-success"></div>
-                                    </div>
-                                    <div>
-                                        <div class="text-truncate">Am I a good boy? The reason I ask is because someone
-                                            told me that people say this to all dogs, even if they aren't good...</div>
-                                        <div class="small text-gray-500">Chicken the Dog · 2w</div>
-                                    </div>
-                                </a>
-                                <a class="dropdown-item text-center small text-gray-500" href="#">Read More Messages</a>
-                            </div>
-                        </li>
-      
-                        <div class="topbar-divider d-none d-sm-block"></div>
-      
+                        
                         <!-- Nav Item - User Information -->
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
@@ -357,13 +231,16 @@ h2.hovered {
       
                 </nav>
                 <!-- End of Topbar -->
-      
+                <div class="app-container" [ngClass]="{'hidden': showEditModal}">
+                    <div class="main-interface">
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
                 <div> <h2>Taux des NCs interne et externe Instantané</h2>
                         <canvas id="chartNC"></canvas>
                         <h2>Taux des NCs interne et exterme Semestrielle</h2>
                         <canvas id="chartNCS"></canvas>
+                        <h2>Satisfaction client</h2>
+                        <canvas id="chartSatisfaction"></canvas>
                       </div>
                     
                       <h2 (mouseenter)="hovered = true" (mouseleave)="hovered = false"
@@ -424,34 +301,119 @@ h2.hovered {
 </div>
 <h2>Liste des projets</h2>
 <table class="table">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Start Date</th>
-        <th>End Date</th>
-        <th>Methodology</th>
-        <th>Objectives</th>
-        <th>Type</th>
-        <th>Responsible Quality</th>
-        <th>Project Manager</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let projet of projets">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Start Date</th>
+      <th>End Date</th>
+      <th>Methodology</th>
+      <th>Objectives</th>
+      <th>Type</th>
+      <th>Responsible Quality</th>
+      <th>Project Manager</th>
+      <th>Satisfaction Client</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let projet of projets">
+      <td><a [routerLink]="['/projects', projet.idP, 'phases']">{{ projet.nomP }}</a></td>
+      <td>{{ projet.descriptionP }}</td>
+      <td>{{ projet.datedebutP | date }}</td>
+      <td>{{ projet.datefinP | date }}</td>
+      <td>{{ projet.methodologie }}</td>
+      <td>{{ projet.objectifs }}</td>
+      <td>{{ projet.typeprojet }}</td>
+      <td>{{ projet.responsableQualiteNom }}</td>
+      <td>{{ projet.chefDeProjetNom }}</td>
+      <td>{{ projet.satisfactionClient }}: {{ projet.valeurSatisfaction }}</td>
+      <td>
+        <button class="btn btn-outline-primary btn-sm" (click)="ouvrirModalModification(projet)">
+            <i class="fas fa-pen"></i>
+          </button>
+          <button class="btn btn-danger btn-sm" (click)="confirmerSuppression(projet)">
+            <i class="fas fa-trash"></i>
+</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<div class="popup" *ngIf="showEditModal">
+    <div class="popup-content">
+      <div class="edit-modal">
+        <div class="modal-content">
+          <span class="close" (click)="fermerModal()" aria-label="Close">&times;</span>
+          
+          <form (ngSubmit)="modifierProjet()">
+            <h3>Modifier le Projet</h3>
         
-        <td><a [routerLink]="['/projects', projet.idP, 'phases']">{{ projet.nomP }}</a></td>
-      
-        <td>{{ projet.descriptionP }}</td>
-        <td>{{ projet.datedebutP | date }}</td>
-        <td>{{ projet.datefinP | date }}</td>
-        <td>{{ projet.methodologie }}</td>
-        <td>{{ projet.objectifs }}</td>
-        <td>{{ projet.typeprojet }}</td>
-        <td>{{ projet.responsableQualiteNom }}</td>
-        <td>{{ projet.chefDeProjetNom }}</td>
-      </tr>
-    </tbody>
-  </table>
-                      
-<!-- Formulaire pour ajouter un nouveau projet -->
+            <div class="form-group">
+                <label for="nomP">Nom du projet:</label>
+                <input type="text" id="nomP" [(ngModel)]="projetSelectionne.nomP" name="nomP" class="form-control" required>
+            </div>
+        
+            <div class="form-group">
+                <label for="descriptionP">Description:</label>
+                <textarea id="descriptionP" [(ngModel)]="projetSelectionne.descriptionP" name="descriptionP" class="form-control"></textarea>
+            </div>
+        
+            <div class="form-group">
+                <label for="datedebutP">Date de début:</label>
+                <input type="date" id="datedebutP" [(ngModel)]="projetSelectionne.datedebutP" name="datedebutP" class="form-control">
+            </div>
+        
+            <div class="form-group">
+                <label for="datefinP">Date de fin:</label>
+                <input type="date" id="datefinP" [(ngModel)]="projetSelectionne.datefinP" name="datefinP" class="form-control">
+            </div>
+        
+            <div class="form-group">
+                <label for="methodologie">Méthodologie:</label>
+                <input type="text" id="methodologie" [(ngModel)]="projetSelectionne.methodologie" name="methodologie" class="form-control">
+            </div>
+        
+            <div class="form-group">
+                <label for="objectifs">Objectifs:</label>
+                <textarea id="objectifs" [(ngModel)]="projetSelectionne.objectifs" name="objectifs" class="form-control"></textarea>
+            </div>
+        
+            <div class="form-group">
+                <label for="typeprojet">Type de projet:</label>
+                <select [(ngModel)]="projetSelectionne.typeprojet" name="typeprojet" class="form-control" id="typeprojet">
+                    <option value="Produit">Produit</option>
+                    <option value="Forfait">Forfait</option>
+                    <option value="Régie">Régie</option>
+                </select>
+            </div>
+        
+            <div class="form-group">
+                <label for="satisfactionClient">Indice de Satisfaction Client:</label>
+                <select [(ngModel)]="projetSelectionne.satisfactionClient" name="satisfactionClient" class="form-control" id="satisfactionClient">
+                    <option value="SI1">SCI1</option>
+                    <option value="SI2">SCI2</option>
+                </select>
+            </div>
+        
+            <div class="form-group">
+                <label for="valeurSatisfaction">Valeur de Satisfaction Client:</label>
+                <input type="number" id="valeurSatisfaction" [(ngModel)]="projetSelectionne.valeurSatisfaction" name="valeurSatisfaction" class="form-control">
+            </div>
+        
+            <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+        </form>
+  
+  <div class="popup" *ngIf="showDeleteModal">
+    <div class="popup-content">
+      <div class="delete-modal">
+        <div class="modal-content">
+          <span class="close" (click)="fermerModalSuppression()" aria-label="Close">&times;</span>
+          <p>Tous les fichiers associés à ce projet (phase, checklist, analyse causale...) seront supprimés. Voulez-vous continuer ?</p>
+          <button (click)="supprimerProjet()">Oui, supprimer</button>
+          <button (click)="fermerModalSuppression()">Annuler</button>
+        </div>
+      </div>
+    </div>
+  </div>
+                    </div>
