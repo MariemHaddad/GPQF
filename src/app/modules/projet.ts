@@ -11,6 +11,9 @@ export class Projet {
     chefDeProjetNom: string;
     satisfactionClient?: string; // Add this property if necessary
     valeurSatisfaction?: number; 
+    defautInternes ?: number; // DI
+    defautTotaux?:number; 
+    nombreRuns?:number;
     constructor(
         nomP: string = '',
         idP: number = 0,
@@ -23,7 +26,10 @@ export class Projet {
         responsableQualiteNom: string = '',
         chefDeProjetNom: string= '',
         satisfactionClient: string = '', // Add this to the constructor
-        valeurSatisfaction: number = 0 
+        valeurSatisfaction: number = 0 ,
+        defautInternes :number = 0, // DI
+        defautTotaux:number =0,
+        nombreRuns:number=0
 
     ) {
         this.nomP = nomP;
@@ -38,5 +44,8 @@ export class Projet {
         this.responsableQualiteNom= responsableQualiteNom;
         this.satisfactionClient = satisfactionClient; // Initialize
         this.valeurSatisfaction = valeurSatisfaction;
+        this.defautInternes = defautInternes;
+        this.defautTotaux = defautTotaux;
+        this.nombreRuns = nombreRuns;
     }
 }

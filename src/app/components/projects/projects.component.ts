@@ -9,6 +9,8 @@ import { Chart } from 'chart.js';
 import { TauxNCData } from 'src/app/modules/taux-nc-data.model';
 import { TauxNCSemestrielResponse } from 'src/app/modules/taux-nc-semestriel-response.model';
 import { SatisfactionDataDTO } from 'src/app/modules/satisfaction-data.model';
+import { DDEDataDTO } from 'src/app/modules/dde-data-dto';
+import { NombreDeRunSemestrielResponse } from 'src/app/modules/nombre-de-run-semestriel-response.model';
 @Component({
   selector: 'app-projects',
   templateUrl: './projects.component.html',
@@ -29,8 +31,11 @@ export class ProjectsComponent implements OnInit {
   responsablesQualite: User[] = [];
   private chartNC: Chart | undefined; 
   private chartNCS: Chart | undefined; 
+  private chartDDE: Chart | undefined; 
   tauxNCSemestriels: TauxNCSemestrielResponse[] = [];
   private chartSatisfaction: Chart | undefined; 
+  private chartNombreRun: Chart | undefined; // Déclaration pour le graphique du Nombre de Run
+  nombreDeRunSemestriels: NombreDeRunSemestrielResponse[] = [];
   showEditModal: boolean = false;
 projetSelectionne: Projet = new Projet();
 showDeleteModal: boolean = false;
@@ -53,7 +58,8 @@ showPopup: boolean = false;
         this.loadTauxNCData(); 
         this.loadTauxNCSemestriels(); 
         this.loadSatisfactionData(); // Chargez les données pour le graphique ici
-
+        this.loadDDEData();
+        this.loadNombreDeRunSemestriel();
         const roleUtilisateur = localStorage.getItem('role');
         this.isDirecteur = roleUtilisateur === 'DIRECTEUR';
     }
@@ -103,7 +109,7 @@ supprimerProjet(): void {
       },
       error: (error) => {
         console.error('Erreur lors de la suppression du projet:', error);
-        alert('Erreur lors de la suppression du projet');
+      
       }
     });
 }
@@ -362,4 +368,91 @@ createSatisfactionChart(satisfactionData: SatisfactionDataDTO[]): void {
       },
     },
   });
-}}
+}
+loadDDEData(): void {
+  this.projetService.getDDESemestriels(this.activiteId).subscribe((data: DDEDataDTO) => {
+    this.createDDEChart(data);
+  }, error => {
+    console.error('Error loading DDE data', error);
+  });
+}
+
+createDDEChart(ddeData: DDEDataDTO): void {
+  if (!ddeData || typeof ddeData !== 'object') {
+    console.error('Invalid DDE Data:', ddeData);
+    return;
+  }
+
+  const keys = Object.keys(ddeData); // Assurez-vous que ddeData est un objet avec des clés
+  const values = Object.values(ddeData); // Récupère les valeurs correspondantes
+
+  if (this.chartDDE) {
+    this.chartDDE.destroy();
+  }
+
+  this.chartDDE = new Chart('chartDDE', {
+    type: 'bar', // ou 'line' selon vos besoins
+    data: {
+      labels: keys,
+      datasets: [{
+        label: 'Données DDE',
+        data: values,
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+}
+loadNombreDeRunSemestriel(): void {
+  this.projetService.getNombreDeRunParSemestre(this.activiteId).subscribe((data: NombreDeRunSemestrielResponse[]) => {
+    this.nombreDeRunSemestriels = data;
+    console.log('Données chargées :', this.nombreDeRunSemestriels);
+    this.createNombreDeRunChart(); // Créer le graphique une fois les données chargées
+  });
+}
+
+// Méthode pour créer le graphique Nombre de Run
+createNombreDeRunChart(): void {
+  const semestres = this.nombreDeRunSemestriels.map(item => item.semestre);
+  const nombreDeRuns = this.nombreDeRunSemestriels.map(item => item.totalRuns);
+
+  // Détruire le graphique précédent s'il existe
+  if (this.chartNombreRun) {
+    this.chartNombreRun.destroy();
+  }
+
+  // Créer le graphique avec Chart.js
+  this.chartNombreRun = new Chart('chartNombreRun', {
+    type: 'line',
+    data: {
+      labels: semestres,
+      datasets: [
+        {
+          label: 'Nombre de Run',
+          data: nombreDeRuns,
+          borderColor: 'rgba(54, 162, 235, 1)',
+          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+          fill: true,
+        }
+      ],
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+        },
+      },
+    },
+  });
+}
+
+}

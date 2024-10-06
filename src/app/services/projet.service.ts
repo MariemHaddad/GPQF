@@ -1,11 +1,13 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { Projet } from 'src/app/modules/projet';
 import { User } from '../modules/user';
 import { TauxNCData } from '../modules/taux-nc-data.model';
 import { TauxNCSemestrielResponse } from '../modules/taux-nc-semestriel-response.model';
 import { SatisfactionDataDTO } from '../modules/satisfaction-data.model';
+import { DDEDataDTO } from '../modules/dde-data-dto';
+import { NombreDeRunSemestrielResponse } from '../modules/nombre-de-run-semestriel-response.model';
 
 @Injectable({
   providedIn: 'root'
@@ -63,5 +65,9 @@ modifierProjet(projetId: number, projet: Projet): Observable<any> {
 supprimerProjet(projetId: number): Observable<any> {
   return this.http.delete(`${this.baseUrl}/supprimer/${projetId}`);
 }
-
+getDDESemestriels(activiteId: number): Observable<DDEDataDTO> {
+  return this.http.get<DDEDataDTO>(`${this.baseUrl}/activite/${activiteId}/ddeSemestriels`);
 }
+getNombreDeRunParSemestre(activiteId: number) {
+  return this.http.get<NombreDeRunSemestrielResponse[]>(`${this.baseUrl}/runs-semestriels/${activiteId}`);
+}}

@@ -241,6 +241,10 @@ h2.hovered {
                         <canvas id="chartNCS"></canvas>
                         <h2>Satisfaction client</h2>
                         <canvas id="chartSatisfaction"></canvas>
+                        <h2>DDE par semestre</h2>
+                        <canvas id="chartDDE"></canvas>
+                        <h2>Nombre de Run Hardware</h2>
+                        <canvas id="chartNombreRun"></canvas>
                       </div>
                     
                       <h2 (mouseenter)="hovered = true" (mouseleave)="hovered = false"
@@ -331,10 +335,10 @@ h2.hovered {
       <td>
         <button class="btn btn-outline-primary btn-sm" (click)="ouvrirModalModification(projet)">
             <i class="fas fa-pen"></i>
-          </button>
-          <button class="btn btn-danger btn-sm" (click)="confirmerSuppression(projet)">
+        </button>
+        <button class="btn btn-danger btn-sm" (click)="confirmerSuppression(projet)">
             <i class="fas fa-trash"></i>
-</button>
+        </button>
       </td>
     </tr>
   </tbody>
