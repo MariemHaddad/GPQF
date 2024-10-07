@@ -70,4 +70,11 @@ getDDESemestriels(activiteId: number): Observable<DDEDataDTO> {
 }
 getNombreDeRunParSemestre(activiteId: number) {
   return this.http.get<NombreDeRunSemestrielResponse[]>(`${this.baseUrl}/runs-semestriels/${activiteId}`);
-}}
+}
+getTauxRealisation8DSemestriel(activiteId: number): Observable<{ [key: string]: number[] }> {
+  return this.http.get<{ [key: string]: number[] }>(`${this.baseUrl}/tauxRealisation8D/${activiteId}`);
+}
+getTauxCBySemestre(activiteId: number): Observable<{ [key: string]: number[] }> {
+  return this.http.get<{ [key: string]: number[] }>(`${this.baseUrl}/activite/${activiteId}/tauxC`);
+}
+}

@@ -14,6 +14,8 @@ export class Projet {
     defautInternes ?: number; // DI
     defautTotaux?:number; 
     nombreRuns?:number;
+    nbr8DRealises?: number;
+    nbrRetoursCritiques?: number;
     constructor(
         nomP: string = '',
         idP: number = 0,
@@ -29,7 +31,9 @@ export class Projet {
         valeurSatisfaction: number = 0 ,
         defautInternes :number = 0, // DI
         defautTotaux:number =0,
-        nombreRuns:number=0
+        nombreRuns:number=0,
+        nbr8DRealises: number = 0,
+        nbrRetoursCritiques: number = 0
 
     ) {
         this.nomP = nomP;
@@ -47,5 +51,7 @@ export class Projet {
         this.defautInternes = defautInternes;
         this.defautTotaux = defautTotaux;
         this.nombreRuns = nombreRuns;
+        this.nbr8DRealises = nbr8DRealises;
+        this.nbrRetoursCritiques = nbrRetoursCritiques;
     }
 }
