@@ -60,71 +60,71 @@ h2.hovered {
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
-                <div class="sidebar-brand-text mx-3">Telnet</div>
+                <div class="sidebar-brand-text mx-3">Menu</div>
             </a>
       
-            <!-- Divider -->
-            <hr class="sidebar-divider my-0">
-      
-            <li class="nav-item active">
-                <a class="nav-link" href="index.html">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                   
-                    <span >Dashboard</span>
-                </a>
-            </li>
-      
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-      
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Interface
-            </div>
+            
+        
       
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
+                <a class="nav-link collapsed"  data-toggle="collapse" data-target="#collapseTwo"
                     aria-expanded="true" aria-controls="collapseTwo">
-                    <i class="fas fa-fw fa-cog"></i>
-                    <span>Components</span>
+                    <i class="fas fa-fw fa-chart-area"></i>
+                    <span>Dashboard de Taux des NCs interne et externe</span>
                 </a>
                 <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Custom Components:</h6>
-                        <a class="collapse-item" href="buttons.html">Buttons</a>
-                        <a class="collapse-item" href="cards.html">Cards</a>
+                        <h6 class="collapse-header">Dashboards:</h6>
+                        <a class="collapse-item" (click)="selectDashboard('Instantané')">Instantané</a>
+                        <a class="collapse-item" (click)="selectDashboard('Semestrielle')">Semestrielle</a>
+                        
                     </div>
                 </div>
             </li>
       
             <!-- Nav Item - Utilities Collapse Menu -->
             <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
-                    aria-expanded="true" aria-controls="collapseUtilities">
-                    <i class="fas fa-fw fa-wrench"></i>
-                    <span>Utilities</span>
-                </a>
-                <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
-                    data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Custom Utilities:</h6>
-                        <a class="collapse-item" href="utilities-color.html">Colors</a>
-                        <a class="collapse-item" href="utilities-border.html">Borders</a>
-                        <a class="collapse-item" href="utilities-animation.html">Animations</a>
-                        <a class="collapse-item" href="utilities-other.html">Other</a>
-                    </div>
-                </div>
+              <a class="nav-link collapsed" (click)="selectDashboard('satisfaction')"  >
+                <i class="fas fa-fw fa-chart-area"></i>
+                <span>Dashboard de Satisfaction client</span>
+              </a>
             </li>
-      
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-      
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Addons
-            </div>
-      
+            <li class="nav-item">
+              <a class="nav-link collapsed" (click)="selectDashboard('libération')"  >
+                <i class="fas fa-fw fa-chart-area"></i>
+                <span>Dashboard de Taux de Libération</span>
+              </a>
+            </li>
+            
+            <li class="nav-item">
+              <a class="nav-link collapsed" (click)="selectDashboard('8D')"  >
+                <i class="fas fa-fw fa-chart-area"></i>
+                <span>Dashboard de Réalisation des 8D</span>
+              </a>
+            </li>
+            
+            <!-- Dashboard des DDE -->
+            <li class="nav-item">
+              <a class="nav-link collapsed" (click)="selectDashboard('dde')">
+                <i class="fas fa-fw fa-chart-area"></i>
+                <span>Dashboard des DDE</span>
+              </a>
+            </li>
+         
+            <li class="nav-item">
+              <a class="nav-link collapsed" (click)="selectDashboard('Efficacitélibération')">
+                <i class="fas fa-fw fa-chart-area"></i>
+                <span>Dashboard d'Efficacité des libérations</span>
+              </a>
+            </li>
+            <!-- Dashboard de Run Hardware -->
+            <li class="nav-item">
+              <a class="nav-link collapsed" (click)="selectDashboard('hardware')" >
+                <i class="fas fa-fw fa-chart-area"></i>
+                <span>Dashboard de Run Hardware</span>
+              </a>
+            </li>
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
@@ -138,46 +138,13 @@ h2.hovered {
                         <a class="collapse-item" href="login">Login</a>
                         <a class="collapse-item" href="register">Register</a>
                         <a class="collapse-item" href="forgot-password.html">Forgot Password</a>
-                        <div class="collapse-divider"></div>
-                        <h6 class="collapse-header">Other Pages:</h6>
-                        <a class="collapse-item" href="404.html">404 Page</a>
-                        <a class="collapse-item" href="blank.html">Blank Page</a>
                     </div>
                 </div>
             </li>
-      
-            <!-- Nav Item - Charts -->
-            <li class="nav-item">
-                <a class="nav-link" href="charts.html">
-                    <i class="fas fa-fw fa-chart-area"></i>
-                    <span>Charts</span></a>
-            </li>
-      
-            <!-- Nav Item - Tables -->
-            <li class="nav-item">
-                <a class="nav-link" href="tables.html">
-                    <i class="fas fa-fw fa-table"></i>
-                    <span>Tables</span></a>
-            </li>
-      
-            <!-- Divider -->
-            <hr class="sidebar-divider d-none d-md-block">
-      
-            <!-- Sidebar Toggler (Sidebar) -->
-            <div class="text-center d-none d-md-inline">
-                <button class="rounded-circle border-0" id="sidebarToggle"></button>
-            </div>
-      
-            <!-- Sidebar Message -->
-           
-      
         </ul>
-        <!-- End of Sidebar -->
-      
-        <!-- Content Wrapper -->
+       
         <div id="content-wrapper" class="d-flex flex-column">
       
-            <!-- Main Content -->
             <div id="content">
       
                 <!-- Topbar -->
@@ -235,20 +202,44 @@ h2.hovered {
                     <div class="main-interface">
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
-                <div> <h2>Taux des NCs interne et externe Instantané</h2>
-                        <canvas id="chartNC"></canvas>
-                        <h2>Taux des NCs interne et exterme Semestrielle</h2>
-                        <canvas id="chartNCS"></canvas>
-                        <h2>Satisfaction client</h2>
-                        <canvas id="chartSatisfaction"></canvas>
-                        <h2>DDE par semestre</h2>
-                        <canvas id="chartDDE"></canvas>
-                        <h2>Nombre de Run Hardware</h2>
-                        <canvas id="chartNombreRun"></canvas>
-                        <h2>Taux de réalisation des 8D</h2>
-                        <canvas id="chartTaux8D"></canvas>
-                        <h2>Taux de conformité externes</h2>
-                        <canvas id="chartTauxConformite"></canvas>
+                  <div *ngIf="selectedDashboard === 'Semestrielle'">
+                    <h2>Taux des NCs interne et externe Semestrielle</h2>
+                    <canvas id="chartNCS"></canvas>
+                  </div>
+                    
+                  
+                  <div *ngIf="selectedDashboard === 'satisfaction'">
+                    <h2>Satisfaction client</h2>
+                    <canvas id="chartSatisfaction"></canvas>
+                  </div>
+                 
+                  <div *ngIf="selectedDashboard === 'libération'">
+                    <h2>Taux de libération</h2>
+                    <canvas id="chartTauxLiberation"></canvas>
+                  </div>
+                  <div *ngIf="selectedDashboard === 'dde'">
+                    <h2>DDE par semestre</h2>
+                    <canvas id="chartDDE"></canvas>
+                  </div>
+                
+                  <div *ngIf="selectedDashboard === 'hardware'">
+                    <h2>Nombre de Run Hardware</h2>
+                    <canvas id="chartNombreRun"></canvas>
+                  </div>
+                  <div *ngIf="selectedDashboard === '8D'">
+                    <h2>Taux de réalisation 8D</h2>
+                    <canvas id="chartTaux8D"></canvas>
+                  </div>
+                  
+                  <div *ngIf="selectedDashboard === 'Efficacitélibération'">
+                    <h2>Efficacité de libération</h2>
+                    <canvas id="chartTauxConformite"></canvas>
+                  </div>
+                  <div *ngIf="selectedDashboard === 'Instantané'">
+                    <h2>Taux des NCs interne et externe Instantané </h2>
+                    <canvas id="chartNC"></canvas>
+                  </div>
+                  
                       </div>
                     
                       <h2 (mouseenter)="hovered = true" (mouseleave)="hovered = false"
@@ -321,6 +312,12 @@ h2.hovered {
       <th>Responsible Quality</th>
       <th>Project Manager</th>
       <th>Satisfaction Client</th>
+      
+      <th> Nombre de défaut Internes</th>
+      <th> Nombre de défaut Totaux</th>
+      <th> Nombre de Runs</th>
+      <th> Nombre de 8D Realisés</th>
+      <th> Nombre de Retours Critiques</th>
       <th>Actions</th>
     </tr>
   </thead>
@@ -336,14 +333,20 @@ h2.hovered {
       <td>{{ projet.responsableQualiteNom }}</td>
       <td>{{ projet.chefDeProjetNom }}</td>
       <td>{{ projet.satisfactionClient }}: {{ projet.valeurSatisfaction }}</td>
-      <td>
-        <button class="btn btn-outline-primary btn-sm" (click)="ouvrirModalModification(projet)">
-            <i class="fas fa-pen"></i>
-        </button>
-        <button class="btn btn-danger btn-sm" (click)="confirmerSuppression(projet)">
-            <i class="fas fa-trash"></i>
-        </button>
-      </td>
+      
+      <td>{{ projet.defautInternes}} </td>
+      <td>{{ projet.defautTotaux}} </td>
+       <td>{{ projet.nombreRuns}} </td>
+        <td>{{ projet.nbr8DRealises}} </td>
+          <td>{{ projet.nbrRetoursCritiques}} </td>
+          <td>
+            <button class="btn btn-outline-primary btn-sm" (click)="ouvrirModalModification(projet)">
+                <i class="fas fa-pen"></i>
+            </button>
+            <button class="btn btn-danger btn-sm" (click)="confirmerSuppression(projet)">
+                <i class="fas fa-trash"></i>
+            </button>
+          </td>
     </tr>
   </tbody>
 </table>

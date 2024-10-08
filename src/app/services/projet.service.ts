@@ -77,4 +77,9 @@ getTauxRealisation8DSemestriel(activiteId: number): Observable<{ [key: string]: 
 getTauxCBySemestre(activiteId: number): Observable<{ [key: string]: number[] }> {
   return this.http.get<{ [key: string]: number[] }>(`${this.baseUrl}/activite/${activiteId}/tauxC`);
 }
+getTauxLiberation(activiteId: number): Observable<{ projet: string, taux: number }[]> {
+  return this.http.get<{ [key: string]: number }>(`${this.baseUrl}/activites/${activiteId}/taux-liberation-semestriel`).pipe(
+    map(data => Object.entries(data).map(([projet, taux]) => ({ projet, taux })))
+  );
+}
 }

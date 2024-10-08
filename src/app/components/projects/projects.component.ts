@@ -46,6 +46,10 @@ private chartTaux8D: Chart | undefined;
 taux8DSemestriels: { [key: string]: number[] } = {};
 tauxConformiteSemestriels: { semestre: string, taux: number }[] = []; // Pour stocker les taux par semestre
 private chartTauxConformite: Chart | undefined; 
+tauxLiberationData: { projet: string, taux: number }[] = [];
+courbeAffichee: string = '';
+private chartTauxLiberation: Chart | undefined;
+selectedDashboard: string = 'nc'; 
 
   constructor(
     private route: ActivatedRoute,
@@ -68,9 +72,124 @@ private chartTauxConformite: Chart | undefined;
         this.loadNombreDeRunSemestriel();
         this.loadTaux8DSemestriels();
         this.loadTauxConformiteSemestriels();
+        this.loadTauxLiberation();
         const roleUtilisateur = localStorage.getItem('role');
         this.isDirecteur = roleUtilisateur === 'DIRECTEUR';
     }
+}
+afficherCourbe(courbe: string) {
+  this.courbeAffichee = courbe;
+}
+selectDashboard(dashboard: string): void {
+  this.selectedDashboard = dashboard;
+  switch (dashboard) {
+    case 'hardware':
+      this.loadNombreDeRunSemestriel();
+      break;
+    case 'dde':
+      this.loadDDEData();
+      break;
+      case 'satisfaction':
+        this.loadSatisfactionData();
+        break;
+        case 'libération':
+        this.loadTauxLiberation();
+        break;
+        case '8D':
+        this.loadTaux8DSemestriels();
+        break;
+        case 'Instantané':
+          this.loadTauxNCData();
+          break;
+          case 'Semestrielle':
+            this.loadTauxNCSemestriels();
+            break;
+            case 'Efficacitélibération':
+              this.loadTauxConformiteSemestriels();
+              break;
+            
+          
+    // Ajoutez d'autres cas si nécessaire
+  }
+}
+loadTauxLiberation(): void { 
+  this.projetService.getTauxLiberation(this.activiteId).subscribe((data: { projet: string, taux: number }[]) => {
+      console.log('Réponse de l\'API:', data); // Vérifiez la structure ici
+      this.tauxLiberationData = data; // Utilisez directement les données retournées
+      console.log('tauxLiberationData:', this.tauxLiberationData); // Vérifiez la nouvelle structure
+      this.createTauxLiberationChart(); // Créez le graphique après avoir chargé les données
+  }, error => {
+      console.error('Erreur lors du chargement des taux de libération:', error);
+  });
+}
+createTauxLiberationChart(): void {
+  // Vérifiez que tauxLiberationData est un tableau
+  if (!Array.isArray(this.tauxLiberationData)) {
+    console.error('Erreur: tauxLiberationData n\'est pas un tableau', this.tauxLiberationData);
+    return;
+  }
+
+  // Détruire le graphique précédent s'il existe
+  if (this.chartTauxLiberation) {
+    this.chartTauxLiberation.destroy();
+  }
+
+  // Trier les données par semestre (ou par projet si nécessaire)
+  this.tauxLiberationData.sort((a, b) => {
+    // Supposons que le semestre est sous la forme "S1-2024" ou "S2-2025"
+    const semestreA = a.projet;
+    const semestreB = b.projet;
+
+    const [partA, yearA] = semestreA.split('-');
+    const [partB, yearB] = semestreB.split('-');
+
+    // Convertir le semestre en nombre pour le tri
+    const numericSemesterA = parseInt(partA.replace('S', ''), 10);
+    const numericSemesterB = parseInt(partB.replace('S', ''), 10);
+
+    // Comparer d'abord l'année, puis le semestre
+    if (yearA !== yearB) {
+      return yearA.localeCompare(yearB);
+    }
+    return numericSemesterA - numericSemesterB;
+  });
+
+  // Obtenir les labels et les taux à partir des données triées
+  const labels = this.tauxLiberationData.map(item => item.projet);
+  const taux = this.tauxLiberationData.map(item => item.taux);
+
+  // Créer le graphique avec Chart.js
+  this.chartTauxLiberation = new Chart('chartTauxLiberation', {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Taux de libération (%)',
+        data: taux,
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        borderColor: 'rgba(255, 99, 132, 1)',
+        borderWidth: 1,
+      }],
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Taux de Libération (%)',
+          },
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'Projet',
+          },
+        },
+      },
+    },
+  });
 }
 loadTauxConformiteSemestriels(): void {
   this.projetService.getTauxCBySemestre(this.activiteId).subscribe((data: { [key: string]: number[] }) => {
@@ -227,10 +346,25 @@ loadTauxNCSemestriels(): void {
 
   // Créer un tableau d'objets pour le tri
   const semestresTriees = semestres.map((semestre, index) => ({
-    semestre,
-    tauxNCInterne: tauxNCInterne[index],
-    tauxNCExterne: tauxNCExterne[index]
-  })).sort((a, b) => b.semestre.localeCompare(a.semestre)); // Trier par semestre dans l'ordre décroissant
+      semestre,
+      tauxNCInterne: tauxNCInterne[index],
+      tauxNCExterne: tauxNCExterne[index]
+  })).sort((a, b) => {
+      const [y1, s1] = a.semestre.split('-'); // Sépare par '-' (année, semestre)
+      const [y2, s2] = b.semestre.split('-'); // Sépare par '-' (année, semestre)
+
+      // Comparaison des années
+      const yearComparison = parseInt(y1) - parseInt(y2);
+      if (yearComparison !== 0) return yearComparison; // Retourne la différence si les années sont différentes
+
+      // Comparaison des semestres
+      const semestre1 = parseInt(s1.replace('S', '')); // Convertir S1/S2 en nombre
+      const semestre2 = parseInt(s2.replace('S', ''));
+      return semestre1 - semestre2; // Trier par semestre
+  });
+
+  // Debug: Vérifier l'ordre des semestres après tri
+  console.log('Semestres triés:', semestresTriees);
 
   // Extraire les données triées
   const labels = semestresTriees.map(item => item.semestre);
@@ -274,6 +408,9 @@ loadTauxNCSemestriels(): void {
       },
   });
 }
+
+
+
 loadTauxNCData(): void {
     this.projetService.getTauxNCData(this.activiteId).subscribe((data: TauxNCData[]) => {
         this.createNCCharts(data); // Créez le graphique après avoir chargé les données
@@ -357,75 +494,87 @@ loadTauxNCData(): void {
     });
   }
   createSatisfactionChart(satisfactionData: SatisfactionDataDTO[]): void {
+    // Vérifiez que satisfactionData est un tableau valide
+    if (!Array.isArray(satisfactionData)) {
+        console.error('Erreur: satisfactionData n\'est pas un tableau', satisfactionData);
+        return;
+    }
+
     // Trier les semestres avant de les utiliser
     satisfactionData.sort((a, b) => {
-      const [s1, y1] = a.semester.split(' ');
-      const [s2, y2] = b.semester.split(' ');
-      const yearComparison = parseInt(y1) - parseInt(y2);
-      return yearComparison !== 0 ? yearComparison : (parseInt(s1.replace('S', '')) - parseInt(s2.replace('S', '')));
+        const [s1, y1] = a.semester.split('-'); // Sépare par '-'
+        const [s2, y2] = b.semester.split('-'); // Sépare par '-'
+        
+        // Comparaison des années
+        const yearComparison = parseInt(y1) - parseInt(y2);
+        if (yearComparison !== 0) return yearComparison; // Retourne la différence si les années sont différentes
+
+        // Comparaison des semestres
+        return parseInt(s1.replace('S', '')) - parseInt(s2.replace('S', ''));
     });
-  
+
     // Extraire les semestres et les valeurs
     const semestres = satisfactionData.map(data => data.semester);
     const si1Values = satisfactionData.map(data => data.si1Value);
     const si2Values = satisfactionData.map(data => data.si2Value);
-  
+
     // Détruire le graphique précédent s'il existe
     if (this.chartSatisfaction) {
-      this.chartSatisfaction.destroy();
+        this.chartSatisfaction.destroy();
     }
-  
+
     // Créer le graphique avec Chart.js
     this.chartSatisfaction = new Chart('chartSatisfaction', {
-      type: 'line',
-      data: {
-        labels: semestres,
-        datasets: [
-          {
-            label: 'Valeur SI1',
-            data: si1Values,
-            borderColor: 'rgba(255, 165, 0, 1)', // Orange
-            backgroundColor: 'rgba(255, 165, 0, 0.2)', // Orange
-            fill: true,
-          },
-          {
-            label: 'Valeur SI2',
-            data: si2Values,
-            borderColor: 'rgba(0, 128, 0, 1)', // Vert
-            backgroundColor: 'rgba(0, 128, 0, 0.2)', // Vert
-            fill: true,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: {
-            beginAtZero: true,
-            title: {
-              display: true,
-              text: 'Valeurs SI1 / SI2',
-            },
-          },
-          x: {
-            title: {
-              display: true,
-              text: 'Semestres',
-            },
-          },
+        type: 'line',
+        data: {
+            labels: semestres,
+            datasets: [
+                {
+                    label: 'Valeur SI1',
+                    data: si1Values,
+                    borderColor: 'rgba(255, 165, 0, 1)', // Orange
+                    backgroundColor: 'rgba(255, 165, 0, 0.2)', // Orange
+                    fill: true,
+                },
+                {
+                    label: 'Valeur SI2',
+                    data: si2Values,
+                    borderColor: 'rgba(0, 128, 0, 1)', // Vert
+                    backgroundColor: 'rgba(0, 128, 0, 0.2)', // Vert
+                    fill: true,
+                },
+            ],
         },
-        plugins: {
-          legend: {
-            display: true,
-            position: 'top',
-          },
-          tooltip: {
-            mode: 'index',
-          },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Valeurs SI1 / SI2',
+                    },
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Semestres',
+                    },
+                },
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                },
+                tooltip: {
+                    mode: 'index',
+                },
+            },
         },
-      },
     });
-  }
+}
+
 loadDDEData(): void {
   this.projetService.getDDESemestriels(this.activiteId).subscribe((data: DDEDataDTO) => {
     this.createDDEChart(data);
@@ -440,20 +589,42 @@ createDDEChart(ddeData: DDEDataDTO): void {
     return;
   }
 
-  const keys = Object.keys(ddeData); // Assurez-vous que ddeData est un objet avec des clés
-  const values = Object.values(ddeData); // Récupère les valeurs correspondantes
+  // Extraire les clés et les valeurs
+  const keys = Object.keys(ddeData);
+  const values = Object.values(ddeData);
 
+  // Associer les clés et les valeurs pour pouvoir les trier ensemble
+  const sortedData = keys.map((key, index) => ({
+    key,
+    value: values[index],
+  }));
+
+  // Trier les données en fonction des clés (supposons qu'elles représentent des semestres)
+  sortedData.sort((a, b) => {
+    const [s1, y1] = a.key.split('-');
+    const [s2, y2] = b.key.split('-');
+
+    const yearComparison = parseInt(y1) - parseInt(y2);
+    return yearComparison !== 0 ? yearComparison : (parseInt(s1.replace('S', '')) - parseInt(s2.replace('S', '')));
+  });
+
+  // Extraire les clés et valeurs triées
+  const sortedKeys = sortedData.map(item => item.key);
+  const sortedValues = sortedData.map(item => item.value);
+
+  // Détruire le graphique précédent s'il existe
   if (this.chartDDE) {
     this.chartDDE.destroy();
   }
 
+  // Créer le graphique avec Chart.js
   this.chartDDE = new Chart('chartDDE', {
     type: 'bar', // ou 'line' selon vos besoins
     data: {
-      labels: keys,
+      labels: sortedKeys,
       datasets: [{
         label: 'Données DDE',
-        data: values,
+        data: sortedValues,
         backgroundColor: 'rgba(54, 162, 235, 0.2)',
         borderColor: 'rgba(54, 162, 235, 1)',
         borderWidth: 1
@@ -480,12 +651,24 @@ loadNombreDeRunSemestriel(): void {
 createNombreDeRunChart(): void {
   // Trier les semestres par ordre croissant
   this.nombreDeRunSemestriels.sort((a, b) => {
-      const [s1, y1] = a.semestre.split(' ');
-      const [s2, y2] = b.semestre.split(' ');
-      const yearComparison = parseInt(y1) - parseInt(y2);
-      return yearComparison !== 0 ? yearComparison : (parseInt(s1.replace('S', '')) - parseInt(s2.replace('S', '')));
+    // Extraire le semestre et l'année
+    const [s1, y1] = a.semestre.split('-');
+    const [s2, y2] = b.semestre.split('-');
+
+    // Convertir les semestres en nombres
+    const semestre1 = parseInt(s1.replace('S', '')); // 1 pour S1 et 2 pour S2
+    const semestre2 = parseInt(s2.replace('S', ''));
+
+    // Comparer d'abord par année
+    const yearComparison = parseInt(y1) - parseInt(y2);
+    
+    // Si les années sont identiques, comparer les semestres
+    return yearComparison !== 0 
+      ? yearComparison 
+      : semestre1 - semestre2; // Comparaison sur le semestre
   });
 
+  // Obtenir les semestres et le nombre de runs à partir des données triées
   const semestres = this.nombreDeRunSemestriels.map(item => item.semestre);
   const nombreDeRuns = this.nombreDeRunSemestriels.map(item => item.totalRuns);
 
@@ -583,6 +766,7 @@ ouvrirModalModification(projet: Projet): void {
 }
 
 confirmerSuppression(projet: Projet): void {
+  console.log('Confirmation de suppression pour le projet:', projet);
   this.projetASupprimer = projet;
   this.showDeleteModal = true;
   this.showEditModal = false; // Ferme le modal de modification s'il était ouvert
@@ -610,18 +794,18 @@ modifierProjet(): void {
 }
 
 supprimerProjet(): void {
-  console.log('Suppression en cours pour le projet ID:', this.projetASupprimer.idP);
+  console.log('ID du projet à supprimer:', this.projetASupprimer.idP);
+  
   this.projetService.supprimerProjet(this.projetASupprimer.idP)
     .subscribe({
       next: (response) => {
-        console.log('Réponse de la suppression:', response);
+        console.log('Réponse de l\'API après suppression:', response);
         alert('Projet supprimé avec succès');
-        this.showDeleteModal = false;
         this.loadProjets(); // Recharger les projets après suppression
       },
       error: (error) => {
         console.error('Erreur lors de la suppression du projet:', error);
-      
+        alert('Erreur lors de la suppression du projet');
       }
     });
 }
