@@ -41,7 +41,7 @@ export class ProjectsComponent implements OnInit {
   showEditModal: boolean = false;
 projetSelectionne: Projet = new Projet();
 showDeleteModal: boolean = false;
-projetASupprimer: Projet = new Projet();
+projetASupprimer: Projet | undefined;
 showPopup: boolean = false; 
 private chartTaux8D: Chart | undefined; 
 taux8DSemestriels: { [key: string]: number[] } = {};
@@ -783,13 +783,13 @@ ouvrirModalModification(projet: Projet): void {
 
 confirmerSuppression(projet: Projet): void {
   console.log('Confirmation de suppression pour le projet:', projet);
-  this.projetASupprimer = projet;
-  this.showDeleteModal = true;
-  this.showEditModal = false; // Ferme le modal de modification s'il était ouvert
+  this.projetASupprimer = projet; // Stocker le projet à supprimer
+  this.showDeleteModal = true; // Ouvrir le modal
 }
 
 fermerModalSuppression(): void {
-  this.showDeleteModal = false;
+  this.showDeleteModal = false; // Fermer le modal
+  this.projetASupprimer = undefined; // Réinitialiser le projet à supprimer
 }
 
 fermerModal(): void {
@@ -819,22 +819,23 @@ loadProjets(): void {
 }
 
 supprimerProjet(): void {
-  console.log('ID du projet à supprimer:', this.projetASupprimer.idP);
-
-  this.projetService.supprimerProjet(this.projetASupprimer.idP)
-    .subscribe({
-      next: (response) => {
-        console.log('Réponse de l\'API après suppression:', response);
-        this.loadProjets(); // Recharger les projets après suppression
-        this.fermerModalSuppression(); // Fermer le modal de suppression après succès
-      },
-      error: (error) => {
-        console.error('Erreur lors de la suppression du projet:', error);
-        console.log('Status de l\'erreur:', error.status);
-        console.log('Message de l\'erreur:', error.message);
-        alert('Erreur lors de la suppression du projet'); // Conserver l'alerte pour les erreurs seulement
-      }
-    });
+  if (this.projetASupprimer && this.projetASupprimer.idP) {
+      console.log('ID du projet à supprimer:', this.projetASupprimer.idP);
+      this.projetService.supprimerProjet(this.projetASupprimer.idP)
+          .subscribe({
+              next: (response) => {
+                  console.log('Réponse de l\'API après suppression:', response);
+                  this.loadProjets(); // Recharger les projets après suppression
+                  this.fermerModalSuppression(); // Fermer le modal après succès
+              },
+              error: (error) => {
+                  console.error('Erreur lors de la suppression du projet:', error);
+                  alert('Erreur lors de la suppression du projet'); // Alerte en cas d'erreur
+              }
+          });
+  } else {
+      console.error('Aucun projet sélectionné pour la suppression.');
+  }
 }
 loadActivites(): void {
   this.activiteService.getActivites().subscribe((data: Activite[]) => {

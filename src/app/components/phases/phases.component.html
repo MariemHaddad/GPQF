@@ -4,7 +4,16 @@
 .table {
   margin-top: 20px;
 }
+.suggestions-list {
+    position: absolute;
+    z-index: 1000; /* S'assurer qu'elle soit au-dessus des autres éléments */
+    background: white; /* Fond blanc pour la lisibilité */
+    width: 100%; /* Prendre toute la largeur du champ de saisie */
+}
 
+.suggestions-list li:hover {
+    background-color: #e9ecef; /* Changer la couleur d'arrière-plan au survol */
+}
 .text-center {
   text-align: center;
 }
@@ -210,7 +219,7 @@ text-decoration: underline; /* Souligne le texte lorsque la classe hovered est a
                             </button>
                           </div>
                           <div class="modal-body">
-                            <p>Êtes-vous sûr de vouloir supprimer cette phase ?</p>
+                            <p>Tous les fichiers associés à cette phase (checklist, analyse causale...) seront supprimés. Voulez-vous continuer ?</p>
                           </div>
                           <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" (click)="closeDeleteModal()">Annuler</button>
@@ -321,9 +330,16 @@ text-decoration: underline; /* Souligne le texte lorsque la classe hovered est a
                                   name="description"
                                   id="description"
                                   class="form-control form-control-user"
-                                  placeholder="Description"
+                                  placeholder="Sélectionnez une description"
                                   required
+                                  readonly
+                                  (click)="onDescriptionChange()"
                                 />
+                                <ul *ngIf="filteredSuggestions.length > 0" class="suggestions-list">
+                                  <li *ngFor="let suggestion of filteredSuggestions" (click)="selectSuggestion(suggestion)">
+                                    {{ suggestion }}
+                                  </li>
+                                </ul>
                               </div>
                               <div class="form-group">
                                 <label for="objectifs">Objectifs</label>

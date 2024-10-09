@@ -21,7 +21,7 @@ export class PhasesComponent implements OnInit {
   phaseIdToDelete: number | undefined;
   phases: Phase[] = [];
   projetId!: number;
-  nouvellePhase: Phase; 
+ 
   selectedPhase?: Phase;
   message: string = '';
   isRqualite: boolean = false; 
@@ -40,6 +40,21 @@ export class PhasesComponent implements OnInit {
   externalNCRate: number = 0;
   chartInternal: any;
   chartExternal: any;
+  VALID_PHASE_NAMES = [
+    "La conception préliminaire",
+    "La conception détaillée",
+    "La mise en œuvre",
+    "La vérification",
+    "La validation",
+    "Code",
+    "Spécification",
+    "Livraison"
+  ];
+
+  nouvellePhase: any = {
+    description: ''
+  };
+  filteredSuggestions: string[] = [];
 
   constructor(
     private phaseService: PhaseService,
@@ -87,6 +102,16 @@ export class PhasesComponent implements OnInit {
     this.createCharts();
     this.createNCCharts();
   }
+
+  onDescriptionChange() {
+    const input = this.nouvellePhase.description.toLowerCase();
+    this.filteredSuggestions = this.VALID_PHASE_NAMES;
+}
+
+selectSuggestion(suggestion: string) {
+  this.nouvellePhase.description = suggestion; // Remplacer la description par la suggestion sélectionnée
+  this.filteredSuggestions = []; // Vider la liste des suggestions après sélection
+}
   openAddModal(): void {
     this.isAddModalOpen = true; // Ouvrir le modal
   }
@@ -196,7 +221,7 @@ export class PhasesComponent implements OnInit {
   }
  
   addPhases() {
-    console.log('Phases to add before sending:', this.phasesToAdd); // Verify data
+    console.log('Phases to add before sending:', this.phasesToAdd);
 
     this.phaseService.addPhases(this.phasesToAdd, this.projetId).subscribe(
         response => {

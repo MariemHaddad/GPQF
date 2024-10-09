@@ -331,7 +331,7 @@ h2.hovered {
                               </button>
                               <button class="btn btn-danger btn-sm" (click)="confirmerSuppression(projet)">
                                 <i class="fas fa-trash"></i>
-                              </button>
+                            </button>
                             </td>
                           </tr>
                         </tbody>
@@ -437,18 +437,24 @@ h2.hovered {
 </div>
 </div>
 </div>
-<div class="overlay" *ngIf="showEditModal"></div>
-  
-  <div class="popup" *ngIf="showDeleteModal">
-    <div class="popup-content">
-      <div class="delete-modal">
-        <div class="modal-content">
-          <span class="close" (click)="fermerModalSuppression()" aria-label="Close">&times;</span>
-          <p>Tous les fichiers associés à ce projet (phase, checklist, analyse causale...) seront supprimés. Voulez-vous continuer ?</p>
-          <button (click)="supprimerProjet()">Oui, supprimer</button>
-          <button (click)="fermerModalSuppression()">Annuler</button>
-        </div>
+<div class="modal" [ngClass]="{'show': showDeleteModal}" [ngStyle]="{'display': showDeleteModal ? 'block' : 'none'}">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title">Confirmation de Suppression</h5>
+              <button type="button" class="close" aria-label="Close" (click)="fermerModalSuppression()">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+          </div>
+          <div class="modal-body">
+              <p>Tous les fichiers associés à ce projet (phase, checklist, analyse causale...) seront supprimés. Voulez-vous continuer ?</p>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" (click)="fermerModalSuppression()">Annuler</button>
+              <button type="button" class="btn btn-danger" (click)="supprimerProjet()">Oui, supprimer</button>
+          </div>
       </div>
-    </div>
-  </div></div>
+  </div>
+  <div class="overlay" *ngIf="showDeleteModal"></div>
+</div>
                     </div>
