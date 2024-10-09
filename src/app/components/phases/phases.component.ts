@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Checklist } from 'src/app/modules/checklist';
 import { Phase } from 'src/app/modules/phase';
@@ -14,7 +14,11 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
   templateUrl: './phases.component.html',
   styleUrls: ['./phases.component.css']
 })
-export class PhasesComponent implements OnInit {
+export class PhasesComponent implements OnInit {  
+  selectedProjectId: number = 0;
+  isAddModalOpen: boolean = false;
+  isDeleteModalOpen = false;
+  phaseIdToDelete: number | undefined;
   phases: Phase[] = [];
   projetId!: number;
   nouvellePhase: Phase; 
@@ -25,6 +29,8 @@ export class PhasesComponent implements OnInit {
   phasesToAdd: Phase[] = [];
   showForm: boolean = false;
   editPhaseForm: any;
+  @ViewChild('editModal') editModal!: ElementRef;
+  isModalOpen = false;
   // Variables pour les variances
   effortVariances: number[] = [];
   scheduleVariances: number[] = [];
@@ -34,6 +40,7 @@ export class PhasesComponent implements OnInit {
   externalNCRate: number = 0;
   chartInternal: any;
   chartExternal: any;
+
   constructor(
     private phaseService: PhaseService,
     private checklistService: ChecklistService,
@@ -47,6 +54,19 @@ export class PhasesComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.editPhaseForm = new FormGroup({
+      description: new FormControl('', Validators.required),
+      objectifs: new FormControl(''),
+      plannedStartDate: new FormControl(''),
+      plannedEndDate: new FormControl(''),
+      effectiveStartDate: new FormControl(''),
+      effectiveEndDate: new FormControl(''),
+      effortActuel: new FormControl(''),
+      effortPlanifie: new FormControl(''),
+      etat: new FormControl(''),
+      statusLivraisonInterne: new FormControl(''),
+      statusLivraisonExterne: new FormControl('')
+    });
     // Registering Chart.js components (including scales)
     Chart.register(...registerables);
 
@@ -67,7 +87,49 @@ export class PhasesComponent implements OnInit {
     this.createCharts();
     this.createNCCharts();
   }
- 
+  openAddModal(): void {
+    this.isAddModalOpen = true; // Ouvrir le modal
+  }
+
+  // Méthode pour fermer le modal d'ajout
+  closeAddModal(): void {
+    this.isAddModalOpen = false; // Fermer le modal
+    this.resetNouvellePhase(); // Réinitialiser le formulaire
+  }
+  openDeleteModal(id: number): void {
+    this.phaseIdToDelete = id; // Sauvegarder l'ID de la phase à supprimer
+    this.isDeleteModalOpen = true; // Ouvrir le modal
+  }
+
+  // Méthode pour fermer le modal de suppression
+  closeDeleteModal(): void {
+    this.isDeleteModalOpen = false; // Fermer le modal
+    this.phaseIdToDelete = undefined; // Réinitialiser l'ID
+  }
+  
+  confirmDeletePhase(): void {
+    if (this.phaseIdToDelete !== undefined) {
+        this.phaseService.deletePhase(this.phaseIdToDelete).subscribe(
+            response => {
+                // Réaction après la suppression réussie
+                this.phases = this.phases.filter(phase => phase.idPh !== this.phaseIdToDelete);
+                this.message = response; // Utilisez la réponse texte directement
+                
+                // Rafraîchir l'affichage des phases
+                this.loadPhases(); // Reload phases after deletion
+
+                setTimeout(() => {
+                    this.loadPhases(); // Reload phases after a short delay if needed
+                }, 2000); // Ajuster le délai si nécessaire
+            },
+            error => {
+                console.error("Erreur lors de la suppression de la phase :", error);
+                alert("Une erreur s'est produite lors de la suppression de la phase.");
+            }
+        );
+    }
+    this.closeDeleteModal(); // Fermer le modal après confirmation
+}
   viewCausalAnalysis(phase: Phase) {
     if (phase.checklist?.idCh) {
       this.router.navigate(['/causal-analysis', phase.checklist.idCh]);
@@ -133,13 +195,13 @@ export class PhasesComponent implements OnInit {
     }
   }
  
-
   addPhases() {
     console.log('Phases to add before sending:', this.phasesToAdd); // Verify data
 
     this.phaseService.addPhases(this.phasesToAdd, this.projetId).subscribe(
         response => {
-            console.log('Server response:', response); // Confirm response
+            console.log('Server response:', response); 
+            this.closeAddModal();// Confirm response
             this.loadPhases(); // Reload phases
             this.resetNouvellePhase(); // Reset form
             this.phasesToAdd = []; // Clear list
@@ -223,105 +285,102 @@ export class PhasesComponent implements OnInit {
         return;
     }
 
-    if (confirm("Êtes-vous sûr de vouloir supprimer cette phase ?")) {
-        this.phaseService.deletePhase(id).subscribe(
-            response => {
-                // Réaction après la suppression réussie
-                this.phases = this.phases.filter(phase => phase.idPh !== id);
-                this.message = response; // Utilisez la réponse texte directement
-                setTimeout(() => {
-                    this.loadPhases(); // Reload phases after a short delay
-                }, 2000); // Adjust delay as necessary
-            },
-            error => {
-                console.error("Erreur lors de la suppression de la phase :", error);
-                alert("Une erreur s'est produite lors de la suppression de la phase.");
-            }
-        );
-    }
-} 
-editPhase(phase: Phase) {
-  this.selectedPhase = { ...phase }; // Créez une copie de la phase à éditer
-  this.isEditMode = true;
-
-  // Initialisez le formulaire avec les anciennes valeurs, y compris effortActuel et effortPlanifie
-  this.editPhaseForm = new FormGroup({
-    description: new FormControl(this.selectedPhase?.description, [Validators.required]),
-    objectifs: new FormControl(this.selectedPhase?.objectifs),
-    plannedStartDate: new FormControl(this.selectedPhase?.plannedStartDate),
-    plannedEndDate: new FormControl(this.selectedPhase?.plannedEndDate),
-    effectiveStartDate: new FormControl(this.selectedPhase?.effectiveStartDate),
-    effectiveEndDate: new FormControl(this.selectedPhase?.effectiveEndDate),
-    effortActuel: new FormControl(this.selectedPhase?.effortActuel, [Validators.required]),
-    effortPlanifie: new FormControl(this.selectedPhase?.effortPlanifie, [Validators.required]),
-    etat: new FormControl(this.selectedPhase?.etat),
-    statusLivraisonInterne: new FormControl(this.selectedPhase?.statusLivraisonInterne),
-    statusLivraisonExterne: new FormControl(this.selectedPhase?.statusLivraisonExterne)
-  });}
-
-  savePhase() {
-    if (this.selectedPhase) {
-      console.log('Tentative de mise à jour de la phase...');
-      this.phaseService.updatePhase(this.selectedPhase).subscribe(
-        response => {
-          console.log('Phase mise à jour:', response);
-          this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
-            this.router.navigate([`/phases/${this.projetId}`]);
-          });
-        },
-        error => {
-          console.error('Erreur lors de la mise à jour de la phase:', error);
-          this.message = 'Erreur lors de la mise à jour de la phase.';
-        }
-      );
-    }
-  }
-
-resetEditMode() {
-  this.selectedPhase = undefined; // Reset selected phase
-  this.isEditMode = false; // Reset edit mode
-  // Reset editPhaseForm if using Reactive Forms
+    // La confirmation se fait via le modal maintenant
+    this.phaseIdToDelete = id; // Sauvegarder l'ID de la phase à supprimer
+    this.isDeleteModalOpen = true; // Ouvrir le modal
 }
+editPhase(phase: Phase) {
+  this.selectedPhase = { ...phase }; 
+  this.isEditMode = true;
+  this.editPhaseForm.setValue({
+    description: phase.description || '',
+    objectifs: phase.objectifs || '',
+    plannedStartDate: phase.plannedStartDate || '',
+    plannedEndDate: phase.plannedEndDate || '',
+    effectiveStartDate: phase.effectiveStartDate || '',
+    effectiveEndDate: phase.effectiveEndDate || '',
+    effortActuel: phase.effortActuel || '',
+    effortPlanifie: phase.effortPlanifie || '',
+    etat: phase.etat || '',
+    statusLivraisonInterne: phase.statusLivraisonInterne || '',
+    statusLivraisonExterne: phase.statusLivraisonExterne || ''
+  });
+  this.isModalOpen = true; // Ouvre le modal ici
+}
+savePhase() {
+  if (this.selectedPhase) {
+    console.log('Tentative de mise à jour de la phase...');
+    this.phaseService.updatePhase(this.selectedPhase).subscribe(
+      response => {
+        console.log('Phase mise à jour:', response);
+
+        // Refresh the phases list
+        this.loadPhases(); 
+
+        // Close the modal and reset the form
+        this.resetEditMode(); 
+
+        // Optional: Display success message
+        this.message = 'Phase mise à jour avec succès.';
+      },
+      error => {
+        console.error('Erreur lors de la mise à jour de la phase:', error);
+        this.message = 'Erreur lors de la mise à jour de la phase.';
+      }
+    );
+  }
+}
+  resetEditMode() {
+    this.selectedPhase = undefined; // Clear the selected phase
+    this.isEditMode = false; // Exit edit mode
+    this.editPhaseForm.reset(); // Reset the form if you're using a reactive form
+  }
 
 getErrorMessage(error: any): string {
   // Handle error messages based on error structure
   return 'Une erreur s\'est produite.';
 }
+
 onSubmitEditPhase() {
-  if (this.editPhaseForm.valid && this.selectedPhase) {
-    console.log('Le formulaire est valide, mise à jour en cours...');
-    const updatedPhase: Phase = {
-      ...this.selectedPhase,
-      description: this.editPhaseForm.value.description,
-      objectifs: this.editPhaseForm.value.objectifs,
-      plannedStartDate: this.editPhaseForm.value.plannedStartDate,
-      plannedEndDate: this.editPhaseForm.value.plannedEndDate,
-      effectiveStartDate: this.editPhaseForm.value.effectiveStartDate,
-      effectiveEndDate: this.editPhaseForm.value.effectiveEndDate,
-      effortActuel: this.editPhaseForm.value.effortActuel,
-      effortPlanifie: this.editPhaseForm.value.effortPlanifie,
-      etat: this.editPhaseForm.value.etat,
-      statusLivraisonInterne: this.editPhaseForm.value.statusLivraisonInterne,
-      statusLivraisonExterne: this.editPhaseForm.value.statusLivraisonExterne
-    };
-    
+  if (this.editPhaseForm.valid) {
+    const updatedPhase = this.editPhaseForm.value;
+    updatedPhase.idPh = this.selectedPhase!.idPh; // Ajoutez l'ID de la phase à l'objet mis à jour
+
     this.phaseService.updatePhase(updatedPhase).subscribe(
       response => {
-        console.log('Phase updated successfully', response);
-        this.isEditMode = false;
-        this.loadPhases(); // Reload phases after update
+        console.log('Phase mise à jour:', response);
+        this.loadPhases(); // Recharger les phases après mise à jour
+        this.message = 'Phase mise à jour avec succès.';
+        this.closeModal(); // Fermer le modal après le succès de la mise à jour
       },
       error => {
-        console.error('Error updating phase', error);
+        console.error('Erreur lors de la mise à jour de la phase:', error);
+        this.message = 'Erreur lors de la mise à jour de la phase.';
       }
     );
   }
 }
+
+// Call closeModal here if necessary
+
+
+closeModal() {
+  this.isModalOpen = false;  // Ferme le modal
+  this.editPhaseForm.reset();  // Réinitialise le formulaire
+  this.selectedPhase = undefined; // Efface la phase sélectionnée
+  this.isEditMode = false; // Sort du mode édition
+}
+  openModal() {
+    this.isModalOpen = true;
+  }
+
+  // Méthode pour fermer la modale
+  
   private formatDate(dateString: string | undefined): string | undefined {
     return dateString ? new Date(dateString).toISOString().split('T')[0] : undefined;
   }
   
-  private resetNouvellePhase() {
+  resetNouvellePhase(): void {
     this.nouvellePhase = new Phase(
       0, '', '', '', '', new Checklist(0, '', '', [], {} as Phase), '', '', 'EN_ATTENTE'
     );
@@ -540,3 +599,5 @@ calculateRates() {
   this.externalNCRate = (externalCount / totalCount) * 100;
 }
 }
+
+

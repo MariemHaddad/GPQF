@@ -1,120 +1,144 @@
 <style>
-.checklist-container {
-    padding: 20px;
-  }
-  .checklist-title {
-  text-align: center;
-  color: #87CEEB;
-  font-weight: bold;
-  margin-bottom: 20px;
-}
-  
-  table {
-    width: 100%;
-    border-collapse: collapse;
+  .checklist-container {
+      padding: 20px;
+    }
+    .checklist-title {
+    text-align: center;
+    color:#1183fcbd;
+    font-weight: bold;
     margin-bottom: 20px;
   }
-  
-  table, th, td {
-    border: 1px solid #ddd;
+  .checklist-container {
+    padding: 20px;
+}
+
+.text-left img {
+    margin-left: -200px; /* Ajustez la valeur pour déplacer le logo */
+}
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+    
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+    
+    thead {
+      background-color: #f4f4f4;
+    }
+    
+    .checklist-status {
+      margin-top: 20px;
   }
   
-  th, td {
-    padding: 10px;
-    text-align: left;
+  .checklist-status p {
+      font-size: 16px;
   }
   
-  thead {
-    background-color: #f4f4f4;
+  .btn-modifier {
+      background-color: #28a745; /* Couleur verte */
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-bottom: 20px; /* Espacement en dessous du bouton */
   }
   
-  .checklist-status {
-    margin-top: 20px;
-}
-
-.checklist-status p {
-    font-size: 16px;
-}
-
-.btn-modifier {
-    background-color: #28a745; /* Couleur verte */
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    margin-bottom: 20px; /* Espacement en dessous du bouton */
-}
-
-.btn-modifier:hover {
-    background-color: #218838; /* Couleur verte plus foncée au survol */
-}
-</style>
-<div class="checklist-container">
-  <h2 class="checklist-title">Checklist de Revue de {{ phaseDescription }} du Projet {{ NomP }}</h2>
-  <div *ngIf="isRQualite">
-  <button type="button" class="btn-modifier" *ngIf="!isEditing" (click)="startEditing()">Modifier</button>
-</div>
-  <!-- Tableau des items de la checklist -->
-  <table *ngIf="checklist">
-    <thead>
-      <tr>
-        <th>Description</th>
-        <th>Résultat</th>
-        <th>Commentaire</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let item of checklist.items">
-        <td>{{ item.description }}</td>
-        <td>
-          <!-- Champ modifiable si en mode édition -->
-          <ng-container *ngIf="isEditing; else readonlyResult">
-            <input [(ngModel)]="item.resultat" type="text" />
-          </ng-container>
-          <ng-template #readonlyResult>{{ item.resultat }}</ng-template>
-        </td>
-        <td>
-          <!-- Champ modifiable si en mode édition -->
-          <ng-container *ngIf="isEditing; else readonlyComment">
-            <input [(ngModel)]="item.commentaire" type="text" />
-          </ng-container>
-          <ng-template #readonlyComment>{{ item.commentaire }}</ng-template>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-
-  <!-- Informations sur la checklist -->
-  <div class="checklist-status">
-    <div *ngIf="isEditing">
-      <p><strong>Statut:</strong> 
-        <select [(ngModel)]="checklist.status">
-          <option *ngFor="let option of statusOptions" [value]="option">{{ option }}</option>
-        </select>
-      </p>
-      <p><strong>Remarque:</strong> 
-        <input [(ngModel)]="checklist.remarque" type="text" />
-      </p>
+  .btn-modifier:hover {
+      background-color: #218838; /* Couleur verte plus foncée au survol */
+  }
+  </style> <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+    <!-- Sidebar Toggle (Topbar) -->
+    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+        <i class="fa fa-bars"></i>
+    </button>
+    <div class="container custom-container d-flex justify-content-between align-items-center">
+        <!-- Logo Telnet -->
+        <div class="text-left">
+            <img src="assets/img/Telnet.png" alt="Telnet Logo" style="width: 200px; height: auto;">
+        </div>
+        
+        <!-- Lien Déconnexion -->
+        <div>
+          <a href="login" class="btn btn-link" style="color: #0a4380bd; text-decoration: none; margin-left: 800px;">Déconnexion</a> <!-- Ajout de margin-left -->
+        </div>
     </div>
-    <div *ngIf="!isEditing">
-      <p><strong>Statut:</strong> {{ checklist.status }}</p>
-      <p><strong>Remarque:</strong> {{ checklist.remarque }}</p>
+</nav>
+  <div class="checklist-container">
+  
+    <h2 class="checklist-title">Checklist de Revue de {{ phaseDescription }} du Projet {{ NomP }}</h2>
+    <div *ngIf="isRQualite">
+    <button type="button" class="btn-modifier" *ngIf="!isEditing" (click)="startEditing()">Modifier</button>
+  </div>
+    <!-- Tableau des items de la checklist -->
+    <table *ngIf="checklist">
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th>Résultat</th>
+          <th>Commentaire</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of checklist.items">
+          <td>{{ item.description }}</td>
+          <td>
+            <!-- Champ modifiable si en mode édition -->
+            <ng-container *ngIf="isEditing; else readonlyResult">
+              <input [(ngModel)]="item.resultat" type="text" />
+            </ng-container>
+            <ng-template #readonlyResult>{{ item.resultat }}</ng-template>
+          </td>
+          <td>
+            <!-- Champ modifiable si en mode édition -->
+            <ng-container *ngIf="isEditing; else readonlyComment">
+              <input [(ngModel)]="item.commentaire" type="text" />
+            </ng-container>
+            <ng-template #readonlyComment>{{ item.commentaire }}</ng-template>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  
+    <!-- Informations sur la checklist -->
+    <div class="checklist-status">
+      <div *ngIf="isEditing">
+        <p><strong>Statut:</strong> 
+          <select [(ngModel)]="checklist.status">
+            <option *ngFor="let option of statusOptions" [value]="option">{{ option }}</option>
+          </select>
+        </p>
+        <p><strong>Remarque:</strong> 
+          <input [(ngModel)]="checklist.remarque" type="text" />
+        </p>
+      </div>
+      <div *ngIf="!isEditing">
+        <p><strong>Statut:</strong> {{ checklist.status }}</p>
+        <p><strong>Remarque:</strong> {{ checklist.remarque }}</p>
+      </div>
+    </div>
+  
+    <!-- Boutons Modifier et Enregistrer les modifications -->
+    <div *ngIf="isRQualite">
+      <button type="submit" class="btn btn-primary btn-user btn-block" *ngIf="isEditing" (click)="saveChecklist()">Enregistrer les modifications</button>
     </div>
   </div>
-
-  <!-- Boutons Modifier et Enregistrer les modifications -->
-  <div *ngIf="isRQualite">
-    <button type="submit" class="btn btn-primary btn-user btn-block" *ngIf="isEditing" (click)="saveChecklist()">Enregistrer les modifications</button>
-  </div>
-</div>
-<script>
-  function handleRefusedStatus() {
-    if (this.checklist.status === 'REFUSE') {
-      if (confirm('Vous devez remplir une analyse causale pour définir la raison de refus de la checklist. Voulez-vous continuer ?')) {
-        this.router.navigate(['/causal-analysis'], { queryParams: { checklistId: this.checklist.idCh } });
+  <script>
+    function handleRefusedStatus() {
+      if (this.checklist.status === 'REFUSE') {
+        if (confirm('Vous devez remplir une analyse causale pour définir la raison de refus de la checklist. Voulez-vous continuer ?')) {
+          this.router.navigate(['/causal-analysis'], { queryParams: { checklistId: this.checklist.idCh } });
+        }
       }
     }
-  }
-</script>
+  </script>

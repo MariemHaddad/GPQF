@@ -14,14 +14,14 @@ export class PhaseService {
 
   // Ajoute des nouvelles phases
   addPhases(phases: Phase[], projetId: number): Observable<string> {
-    console.log('Sending phases:', phases); // Verify data
+    console.log('Sending phases:', phases); // Vérifiez les données
 
     return this.http.post<string>(`${this.apiUrl}/ajouterPhases`, phases, {
         params: new HttpParams().set('projetId', projetId.toString()),
         headers: new HttpHeaders({
             'Content-Type': 'application/json'
         }),
-        responseType: 'text' as 'json'  // Adjust responseType if needed
+        responseType: 'text' as 'json'  // Ajustez le type de réponse si nécessaire
     });
 }
   
@@ -51,8 +51,8 @@ getScheduleVariance(phaseId: number): Observable<number> {
 deletePhase(id: number): Observable<any> {
   return this.http.delete(`http://localhost:8080/api/phases/${id}`,{ responseType: 'text' });
 }
-updatePhase(phase: Phase) {
-  return this.http.put<Phase>(`http://localhost:8080/api/phases/updatePhase/${phase.idPh}`, phase);
+updatePhase(phase: Phase): Observable<any> {
+  return this.http.put('http://localhost:8080/api/phases/updatePhase/' + phase.idPh, phase, { responseType: 'text' });
 }
 getTauxNCExterne(projetId: number): Observable<number> {
   return this.http.get<number>(`${this.apiUrl}/projet/${projetId}/tauxNCExterne`);

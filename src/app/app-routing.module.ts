@@ -14,7 +14,7 @@ const routes: Routes = [
    // Redirection par défaut
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
-  { path: 'forgotpassword', component: ForgetpasswordComponent },
+  { path: 'forgetpassword', component: ForgetpasswordComponent },
   { path: 'home', component: HomeComponent },
 
   { path: 'admin', component: AdminComponent },
