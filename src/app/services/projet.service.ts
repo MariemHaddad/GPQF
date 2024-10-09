@@ -34,18 +34,19 @@ export class ProjetService {  private baseUrl = 'http://localhost:8080/api/proje
       .set('activiteId', activiteId.toString())
       .set('responsableQualiteNom', responsableQualiteNom)
       .set('nomC', nomC);
-
+  
     if (chefDeProjetNom) {
       params = params.set('chefDeProjetNom', chefDeProjetNom);
     }
-
+  
     const options = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json'
       }),
-      params
+      params,
+      responseType: 'text' as 'json'  // <-- Ceci indique à Angular de traiter la réponse comme du texte
     };
-
+  
     return this.http.post(`${this.baseUrl}/ajouter`, projet, options);
   }
   getTauxNCData(activiteId: number): Observable<TauxNCData[]> {
@@ -59,11 +60,14 @@ getSatisfactionData(activiteId: number): Observable<SatisfactionDataDTO[]> {
 }
 modifierProjet(projetId: number, projet: Projet): Observable<any> {
   return this.http.put(`${this.baseUrl}/modifier/${projetId}`, projet, {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+    headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    responseType: 'text' // Ajouter cette option pour spécifier que la réponse est du texte
   });
 }
 supprimerProjet(projetId: number): Observable<any> {
-  return this.http.delete(`${this.baseUrl}/supprimer/${projetId}`);
+  return this.http.delete(`${this.baseUrl}/supprimer/${projetId}`, {
+    responseType: 'text' // Spécifier que la réponse attendue est du texte
+  });
 }
 getDDESemestriels(activiteId: number): Observable<DDEDataDTO> {
   return this.http.get<DDEDataDTO>(`${this.baseUrl}/activite/${activiteId}/ddeSemestriels`);

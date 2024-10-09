@@ -18,6 +18,7 @@ import { NombreDeRunSemestrielResponse } from 'src/app/modules/nombre-de-run-sem
   styleUrls: ['./projects.component.css']
 })
 export class ProjectsComponent implements OnInit {
+  isModalOpen = false;
   showAddProjectForm: boolean = false;
   hovered: boolean = false;
   activiteId: number = 0;
@@ -111,6 +112,9 @@ selectDashboard(dashboard: string): void {
           
     // Ajoutez d'autres cas si nécessaire
   }
+}
+openModal() {
+  this.isModalOpen = true;
 }
 loadTauxLiberation(): void { 
   this.projetService.getTauxLiberation(this.activiteId).subscribe((data: { projet: string, taux: number }[]) => {
@@ -714,11 +718,7 @@ loadResponsablesQualite(): void {
   });
 }
 
-loadProjets(): void {
-  this.projetService.getProjetsByActivite(this.activiteId).subscribe((data: Projet[]) => {
-    this.projets = data;
-  });
-}
+
 
 ajouterProjet(): void {
   // Vérifiez si les champs requis sont définis
@@ -736,7 +736,7 @@ ajouterProjet(): void {
   // Créez un nouvel objet Projet avec toutes les propriétés requises
   let nouveauProjet: Projet = {
     nomP: this.nouveauProjet.nomP,
-    idP: 0, // Vous devez définir une valeur pour idP ici, car TypeScript l'attend
+    idP: 0, // L'ID du projet sera généré par le backend
     descriptionP: this.nouveauProjet.descriptionP,
     datedebutP: this.nouveauProjet.datedebutP,
     datefinP: this.nouveauProjet.datefinP,
@@ -745,7 +745,6 @@ ajouterProjet(): void {
     typeprojet: this.nouveauProjet.typeprojet,
     responsableQualiteNom: this.responsableQualiteNom,
     chefDeProjetNom: this.chefDeProjetNom
-
   };
 
   // Appelez le service pour ajouter le projet
@@ -753,16 +752,33 @@ ajouterProjet(): void {
     response => {
       console.log(response);
       this.loadProjets(); // Rechargez la liste des projets après l'ajout
+      this.showAddProjectForm = false; // Fermer le formulaire après l'ajout réussi
+      this.resetForm(); // Réinitialiser le formulaire après l'ajout
     },
     error => {
       console.error("Erreur lors de l'ajout du projet :", error);
     }
   );
+}resetForm(): void {
+  this.nouveauProjet = {
+    idP: 0, // Réinitialiser à 0 ou à une valeur par défaut
+    nomP: '',
+    descriptionP: '',
+    datedebutP: '',
+    datefinP: '',
+    methodologie: '',
+    objectifs: '',
+    typeprojet: '',
+    responsableQualiteNom: '', // Ajoutez cette propriété ici
+    chefDeProjetNom: ''        // Ajoutez cette propriété ici
+  };
+  this.responsableQualiteNom = '';
+  this.nomC = '';
+  this.chefDeProjetNom = ''; // Réinitialisez si nécessaire
 }
 ouvrirModalModification(projet: Projet): void {
-  this.projetSelectionne = { ...projet }; // Clonez l'objet pour ne pas modifier directement
-  this.showEditModal = true;
-  this.showDeleteModal = false; // Ferme le modal de suppression s'il était ouvert
+  this.projetSelectionne = { ...projet }; // Cloner l'objet projet
+  this.showEditModal = true; // Ouvrir le modal de modification
 }
 
 confirmerSuppression(projet: Projet): void {
@@ -777,35 +793,46 @@ fermerModalSuppression(): void {
 }
 
 fermerModal(): void {
-  this.showEditModal = false;
+  this.showEditModal = false; // Fermer le modal
 }
+
 modifierProjet(): void {
-  console.log('Modification en cours pour le projet:', this.projetSelectionne);
-  this.projetService.modifierProjet(this.projetSelectionne.idP, this.projetSelectionne)
-    .subscribe({
-      next: (response) => {
-        console.log('Réponse de la modification:', response);
-        alert('Projet modifié avec succès');
-        this.showEditModal = false;
-        this.loadProjets(); // Recharger les projets après modification
-      },
-      error: (error)=> {console.error('Erreur lors de la modification du projet:', error);}
-    });
+  if (this.projetSelectionne) {
+    this.projetService.modifierProjet(this.projetSelectionne.idP, this.projetSelectionne)
+      .subscribe({
+        next: (response) => {
+          console.log('Projet modifié avec succès:', response);
+          this.showEditModal = false; // Fermer le modal
+          this.loadProjets(); // Recharger la liste des projets après modification
+        },
+        error: (error) => {
+          console.error('Erreur lors de la modification du projet:', error);
+        }
+      });
+  }
+}
+
+loadProjets(): void {
+  this.projetService.getProjetsByActivite(this.activiteId).subscribe((data: Projet[]) => {
+    this.projets = data;
+  });
 }
 
 supprimerProjet(): void {
   console.log('ID du projet à supprimer:', this.projetASupprimer.idP);
-  
+
   this.projetService.supprimerProjet(this.projetASupprimer.idP)
     .subscribe({
       next: (response) => {
         console.log('Réponse de l\'API après suppression:', response);
-        alert('Projet supprimé avec succès');
         this.loadProjets(); // Recharger les projets après suppression
+        this.fermerModalSuppression(); // Fermer le modal de suppression après succès
       },
       error: (error) => {
         console.error('Erreur lors de la suppression du projet:', error);
-        alert('Erreur lors de la suppression du projet');
+        console.log('Status de l\'erreur:', error.status);
+        console.log('Message de l\'erreur:', error.message);
+        alert('Erreur lors de la suppression du projet'); // Conserver l'alerte pour les erreurs seulement
       }
     });
 }

@@ -4,6 +4,12 @@
     background-color: #f9f9f9;
     border-radius: 8px;
   }
+  .analyse-title {
+    text-align: center;
+    color:#1183fcbd;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
   .btn-modifier {
     background-color: #28a745; /* Couleur verte */
     color: white;
@@ -80,7 +86,9 @@
 
   .btn-save:hover, .btn-add-cause:hover {
     background-color: #218838;
-  }
+  }.text-left img {
+    margin-left: -200px; /* Ajustez la valeur pour déplacer le logo */
+}
 
   .saved-analysis {
     margin-top: 20px;
@@ -93,13 +101,24 @@
   .saved-analysis p {
     margin: 5px 0;
   }
-  .analyse-title {
-text-align: center;
-color: #87CEEB;
-font-weight: bold;
-margin-bottom: 20px;
-}
-</style>
+  
+</style><nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+  <!-- Sidebar Toggle (Topbar) -->
+  <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+      <i class="fa fa-bars"></i>
+  </button>
+  <div class="container custom-container d-flex justify-content-between align-items-center">
+      <!-- Logo Telnet -->
+      <div class="text-left">
+          <img src="assets/img/Telnet.png" alt="Telnet Logo" style="width: 200px; height: auto;">
+      </div>
+      
+      <!-- Lien Déconnexion -->
+      <div>
+        <a href="login" class="btn btn-link" style="color: #0a4380bd; text-decoration: none; margin-left: 800px;">Déconnexion</a> <!-- Ajout de margin-left -->
+      </div>
+  </div>
+</nav>
 
 <div class="analyse-container">
   <h2 class="analyse-title">Analyse Causale</h2>
@@ -163,7 +182,7 @@ margin-bottom: 20px;
             <td><input [(ngModel)]="cause.categorie" placeholder="Catégorie" [attr.readonly]="!isRqualite ? true : null"></td>
             <td><input type="number" [(ngModel)]="cause.pourcentage" placeholder="Pourcentage" [attr.readonly]="!isRqualite ? true : null"></td>
             <td><input [(ngModel)]="cause.action" placeholder="Action" [attr.readonly]="!isRqualite ? true : null"></td>
-          </tr>
+          </tr> 
         </tbody>
       </table>
       <button (click)="addCause()" *ngIf="isRqualite" class="btn-add-cause">Ajouter une Cause</button>

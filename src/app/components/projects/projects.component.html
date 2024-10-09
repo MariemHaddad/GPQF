@@ -1,29 +1,55 @@
 
 <style>
-    .navbar-dropdown-item {
-        margin-right: 100px;
-        .custom-container {
-      margin-top: -150px;
-      h2 {
-  cursor: pointer; /* Change le curseur en pointeur pour indiquer qu'il est cliquable */
-}.popup {
-  position: fixed;
+ .container {
+  max-width: 1200px; /* Limiter la largeur maximale */
+  margin: 0 auto; /* Centrer le conteneur */
+  padding: 0 15px; /* Ajouter un peu d'espace sur les côtés */
+}
+
+.table {
+  margin-top: 20px;
+  margin-left: auto; /* Centrer la table horizontalement */
+  margin-right: auto; /* Centrer la table horizontalement */
+}
+.text-center {
+  text-align: center;
+}
+
+.badge {
+  font-size: 14px;
+  padding: 5px;
+}
+
+.btn-outline-info {
+  margin: 0 5px;
+}
+.text-left img {
+    margin-left: -100px; /* Ajustez la valeur pour déplacer le logo */
+}
+.modal {
+  display: none; /* Par défaut, le modal est caché */
+  position: fixed; /* Rendre le modal fixe */
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999; /* Valeur très élevée pour le pop-up */
+  overflow: hidden; /* Éviter le défilement du corps de la page en arrière-plan */
+  z-index: 1040; /* Assurez-vous que cela soit au-dessus du contenu */
 }
-.custom-container{
-    position: center;
-    margin-left: 5000px;
 
-   
-  
+.modal.show {
+  display: block; /* Afficher le modal quand isModalOpen est vrai */
+  overflow-y: auto; /* Autoriser le défilement vertical */
+}
+
+.modal-dialog {
+  max-width: 800px; /* Ajustez la largeur du modal selon vos besoins */
+  width: 100%; /* Assurez-vous que le modal utilise toute la largeur disponible */
+}
+
+.modal-body {
+  max-height: none; /* Permettre au corps du modal de prendre toute la hauteur nécessaire */
+  padding: 20px; /* Ajouter de l'espace autour du contenu */
 }
 
 .popup-content {
@@ -39,31 +65,35 @@
   text-align: right; /* Aligner à droite */
   cursor: pointer; /* Pour indiquer qu'il est cliquable */
 }
-.main-interface {
-  z-index: 1; /* Ou pas de z-index */
-}
+
 .add-project-header.hovered {
   text-decoration: underline; /* Facultatif : effet lors du survol */
 }
 h2.hovered {
   text-decoration: underline; /* Souligne le texte lorsque la classe hovered est appliquée */
 }
-    } /* Ajustez la valeur selon vos besoins */
-    }</style>
-    <div id="wrapper">
+    </style>
+     <div id="wrapper">
+  
+      <!-- Sidebar -->
+      <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
     
-        <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-      
-            <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
-                <div class="sidebar-brand-icon rotate-n-15">
-                </div>
-                <div class="sidebar-brand-text mx-3">Menu</div>
-            </a>
-      
-            
-        
+          <!-- Sidebar - Brand -->
+          <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+              <div class="sidebar-brand-icon rotate-n-15">
+              </div>
+              <div class="sidebar-brand-text mx-3">Menu</div>
+          </a>
+    
+          <!-- Divider -->
+          <hr class="sidebar-divider my-0">
+    
+          <li class="nav-item active">
+              <a class="nav-link" href="index.html">
+         
+                <span >Projets</span>
+              </a>
+          </li>
       
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item">
@@ -137,242 +167,277 @@ h2.hovered {
            
         </ul>
        
-        <div id="content-wrapper" class="d-flex flex-column">
+              <!-- Content Wrapper -->
+      <div id="content-wrapper" class="d-flex flex-column">
       
-            <div id="content">
-      
-                <!-- Topbar -->
-                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-      
-                    <!-- Sidebar Toggle (Topbar) -->
-                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                        <i class="fa fa-bars"></i>
-                    </button>
-                    <div class="container custom-container">
-                    <!-- Topbar Search -->
-                    <div class="text-right">
-                        <img src="assets/img/Telnet.png" alt="Telnet Logo" class="center" style="width: 200px; height: auto;">
-                      </div>
-                    </div>
-                 
-                </nav>
-                <!-- End of Topbar -->
-                <div class="app-container" [ngClass]="{'hidden': showEditModal}">
+        <div id="content">
+  
+            <!-- Topbar -->
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+  
+                <!-- Sidebar Toggle (Topbar) -->
+                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                    <i class="fa fa-bars"></i>
+                </button>
+                <div class="container custom-container">
+                <!-- Topbar Search -->
+                <div class="text-left">
+                    <img src="assets/img/Telnet.png" alt="Telnet Logo" class="center" style="width: 200px; height: auto;">
+                  </div>
+                </div>
+              
+            </nav>
+            <div class="container">
+              <div class="row justify-content-center">
+                <div class="col-md-14"> <!-- Centrez le contenu en utilisant une colonne -->
+                  <div class="app-container" [ngClass]="{'hidden': showEditModal}">
                     <div class="main-interface">
-                <!-- Begin Page Content -->
-                <div class="container-fluid">
-                  <div *ngIf="selectedDashboard === 'Semestrielle'">
-                    <h2>Taux des NCs interne et externe Semestrielle</h2>
-                    <canvas id="chartNCS"></canvas>
-                  </div>
-                    
-                  
-                  <div *ngIf="selectedDashboard === 'satisfaction'">
-                    <h2>Satisfaction client</h2>
-                    <canvas id="chartSatisfaction"></canvas>
-                  </div>
-                 
-                  <div *ngIf="selectedDashboard === 'libération'">
-                    <h2>Taux de libération</h2>
-                    <canvas id="chartTauxLiberation"></canvas>
-                  </div>
-                  <div *ngIf="selectedDashboard === 'dde'">
-                    <h2>DDE par semestre</h2>
-                    <canvas id="chartDDE"></canvas>
-                  </div>
-                
-                  <div *ngIf="selectedDashboard === 'hardware'">
-                    <h2>Nombre de Run Hardware</h2>
-                    <canvas id="chartNombreRun"></canvas>
-                  </div>
-                  <div *ngIf="selectedDashboard === '8D'">
-                    <h2>Taux de réalisation 8D</h2>
-                    <canvas id="chartTaux8D"></canvas>
-                  </div>
-                  
-                  <div *ngIf="selectedDashboard === 'Efficacitélibération'">
-                    <h2>Efficacité de libération</h2>
-                    <canvas id="chartTauxConformite"></canvas>
-                  </div>
-                  <div *ngIf="selectedDashboard === 'Instantané'">
-                    <h2>Taux des NCs interne et externe Instantané </h2>
-                    <canvas id="chartNC"></canvas>
-                  </div>
-                  
+                      <!-- Begin Page Content -->
+                      <div class="container-fluid">
+                        <div *ngIf="selectedDashboard === 'Semestrielle'">
+                          <h2>Taux des NCs interne et externe Semestrielle</h2>
+                          <canvas id="chartNCS"></canvas>
+                        </div>
+                        <div *ngIf="selectedDashboard === 'satisfaction'">
+                          <h2>Satisfaction client</h2>
+                          <canvas id="chartSatisfaction"></canvas>
+                        </div>
+                        <div *ngIf="selectedDashboard === 'libération'">
+                          <h2>Taux de libération</h2>
+                          <canvas id="chartTauxLiberation"></canvas>
+                        </div>
+                        <div *ngIf="selectedDashboard === 'dde'">
+                          <h2>DDE par semestre</h2>
+                          <canvas id="chartDDE"></canvas>
+                        </div>
+                        <div *ngIf="selectedDashboard === 'hardware'">
+                          <h2>Nombre de Run Hardware</h2>
+                          <canvas id="chartNombreRun"></canvas>
+                        </div>
+                        <div *ngIf="selectedDashboard === '8D'">
+                          <h2>Taux de réalisation 8D</h2>
+                          <canvas id="chartTaux8D"></canvas>
+                        </div>
+                        <div *ngIf="selectedDashboard === 'Efficacitélibération'">
+                          <h2>Efficacité de libération</h2>
+                          <canvas id="chartTauxConformite"></canvas>
+                        </div>
+                        <div *ngIf="selectedDashboard === 'Instantané'">
+                          <h2>Taux des NCs interne et externe Instantané </h2>
+                          <canvas id="chartNC"></canvas>
+                        </div>
                       </div>
-                    
+                      
                       <h2 (mouseenter)="hovered = true" (mouseleave)="hovered = false"
-                      [ngClass]="{'hovered': hovered}" 
-                      (click)="showAddProjectForm = true"
-                      style="color: #003366; font-size: 1.2em; text-align: right; cursor: pointer;">
-                      Ajouter un nouveau projet ?
-                  </h2>
+                          [ngClass]="{'hovered': hovered}" 
+                          (click)="showAddProjectForm = true"
+                          class="text-right"
+                          style="color: #003366; font-size: 1.2em; cursor: pointer;">
+                          Ajouter un nouveau projet ?
+                      </h2>
+            
+                      <div *ngIf="showAddProjectForm">
+                        <form (ngSubmit)="ajouterProjet()" class="user">
+                          <div class="form-group">
+                            <input type="text" [(ngModel)]="nouveauProjet.nomP" name="nomP" class="form-control form-control-user" placeholder="Nom du projet" required>
+                          </div>
+                          <div class="form-group">
+                            <textarea [(ngModel)]="nouveauProjet.descriptionP" name="descriptionP" class="form-control form-control-user" placeholder="Description" required></textarea>
+                          </div>
+                          <div class="form-group row">
+                            <div class="col-sm-6 mb-3 mb-sm-0">
+                              <input type="date" [(ngModel)]="nouveauProjet.datedebutP" name="datedebutP" class="form-control form-control-user" placeholder="Date de début" required>
+                            </div>
+                            <div class="col-sm-6">
+                              <input type="date" [(ngModel)]="nouveauProjet.datefinP" name="datefinP" class="form-control form-control-user" placeholder="Date de fin" required>
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <input type="text" [(ngModel)]="nouveauProjet.methodologie" name="methodologie" class="form-control form-control-user" placeholder="Méthodologie" required>
+                          </div>
+                          <div class="form-group">
+                            <textarea [(ngModel)]="nouveauProjet.objectifs" name="objectifs" class="form-control form-control-user" placeholder="Objectifs" required></textarea>
+                          </div>
+                          <div class="form-group">
+                            <select [(ngModel)]="nouveauProjet.typeprojet" name="typeprojet" class="form-control form-control-user" placeholder="Type de projet" required>
+                              <option value="" disabled selected>Type de projet</option>
+                              <option value="Produit">Produit</option>
+                              <option value="Forfait">Forfait</option>
+                              <option value="Régie">Régie</option>
+                            </select>
+                          </div>
+                          <div class="form-group" *ngIf="isDirecteur">
+                            <select [(ngModel)]="chefDeProjetNom" name="chefDeProjetNom" class="form-control form-control-user" placeholder="Chef de projet" required>
+                              <option value="" disabled selected>Choisir le Chef de projet</option>
+                              <option *ngFor="let chef of chefsDeProjet" [value]="chef.nom">{{ chef.nom }}</option>
+                            </select>
+                          </div>
+                          <div class="form-group">
+                            <select [(ngModel)]="responsableQualiteNom" name="responsableQualiteNom" class="form-control form-control-user" placeholder="Responsable qualité" required>
+                              <option value="" disabled selected>Choisir le Responsable qualité</option>
+                              <option *ngFor="let rq of responsablesQualite" [value]="rq.nom">{{ rq.nom }}</option>
+                            </select>
+                          </div>
+                          <div class="form-group">
+                            <input type="text" [(ngModel)]="nomC" name="nomC" class="form-control form-control-user" placeholder="Nom du client" required>
+                          </div>
+                          <button type="submit" class="btn btn-primary btn-user btn-block">Ajouter Projet</button>
+                          <hr>
+                        </form>
+                      </div>
+            
+                      <h2>Liste des projets</h2>
+                      <table class="table">
+                        <thead>
+                          <tr>
+                            <th>Nom</th>
+                            <th>Description</th>
+                            <th>Date Début</th>
+                            <th>Date Fin</th>
+                            <th>Methodologie</th>
+                            <th>Objectives</th>
+                            <th>Type</th>
+                            <th>Responsable Qualité</th>
+                            <th>Chef de Projet</th>
+                            <th>Satisfaction Client</th>
+                            <th>Nombre de défaut Internes</th>
+                            <th>Nombre de défaut Totaux</th>
+                            <th>Nombre de Runs Hardware</th>
+                            <th>Nombre de 8D Realisés</th>
+                            <th>Nombre de Retours Critiques</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let projet of projets">
+                            <td><a [routerLink]="['/projects', projet.idP, 'phases']">{{ projet.nomP }}</a></td>
+                            <td>{{ projet.descriptionP }}</td>
+                            <td>{{ projet.datedebutP | date }}</td>
+                            <td>{{ projet.datefinP | date }}</td>
+                            <td>{{ projet.methodologie }}</td>
+                            <td>{{ projet.objectifs }}</td>
+                            <td>{{ projet.typeprojet }}</td>
+                            <td>{{ projet.responsableQualiteNom }}</td>
+                            <td>{{ projet.chefDeProjetNom }}</td>
+                            <td>{{ projet.satisfactionClient }}: {{ projet.valeurSatisfaction }}</td>
+                            <td>{{ projet.defautInternes }} </td>
+                            <td>{{ projet.defautTotaux }} </td>
+                            <td>{{ projet.nombreRuns }} </td>
+                            <td>{{ projet.nbr8DRealises }} </td>
+                            <td>{{ projet.nbrRetoursCritiques }} </td>
+                            <td>
+                              <button class="btn btn-outline-primary btn-sm" (click)="ouvrirModalModification(projet)">
+                                <i class="fas fa-pen"></i>
+                              </button>
+                              <button class="btn btn-danger btn-sm" (click)="confirmerSuppression(projet)">
+                                <i class="fas fa-trash"></i>
+                              </button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+            
+                  <div class="modal" [ngClass]="{'show': showEditModal}" [ngStyle]="{'display': showEditModal ? 'block' : 'none'}">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title">Modifier le Projet</h5>
+                          <button type="button" class="close" aria-label="Close" (click)="fermerModal()">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <form (ngSubmit)="modifierProjet()">
+                            <!-- Form fields for modifying project -->
+                          
+          <div class="form-group">
+            <label for="nomP">Nom du projet:</label>
+            <input type="text" id="nomP" [(ngModel)]="projetSelectionne.nomP" name="nomP" class="form-control" required>
+          </div>
 
-<div *ngIf="showAddProjectForm">
-  <form (ngSubmit)="ajouterProjet()" class="user">
-    <div class="form-group">
-      <input type="text" [(ngModel)]="nouveauProjet.nomP" name="nomP" class="form-control form-control-user" placeholder="Nom du projet" required>
-    </div>
-    <div class="form-group">
-      <textarea [(ngModel)]="nouveauProjet.descriptionP" name="descriptionP" class="form-control form-control-user" placeholder="Description" required></textarea>
-    </div>
-    <div class="form-group row">
-      <div class="col-sm-6 mb-3 mb-sm-0">
-        <input type="date" [(ngModel)]="nouveauProjet.datedebutP" name="datedebutP" class="form-control form-control-user" placeholder="Date de début" required>
-      </div>
-      <div class="col-sm-6">
-        <input type="date" [(ngModel)]="nouveauProjet.datefinP" name="datefinP" class="form-control form-control-user" placeholder="Date de fin" required>
-      </div>
-    </div>
-    <div class="form-group">
-      <input type="text" [(ngModel)]="nouveauProjet.methodologie" name="methodologie" class="form-control form-control-user" placeholder="Méthodologie" required>
-    </div>
-    <div class="form-group">
-      <textarea [(ngModel)]="nouveauProjet.objectifs" name="objectifs" class="form-control form-control-user" placeholder="Objectifs" required></textarea>
-    </div>
-    <div class="form-group">
-      <select [(ngModel)]="nouveauProjet.typeprojet" name="typeprojet" class="form-control form-control-user" placeholder="Type de projet" required>
-        <option value="" disabled selected>Type de projet</option>
-        <option value="Produit">Produit</option>
-        <option value="Forfait">Forfait</option>
-        <option value="Régie">Régie</option>
-      </select>
-    </div>
-    <div class="form-group" *ngIf="isDirecteur">
-      <select [(ngModel)]="chefDeProjetNom" name="chefDeProjetNom" class="form-control form-control-user" placeholder="Chef de projet" required>
-        <option value="" disabled selected>Choisir le Chef de projet</option>
-        <option *ngFor="let chef of chefsDeProjet" [value]="chef.nom">{{ chef.nom }}</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <select [(ngModel)]="responsableQualiteNom" name="responsableQualiteNom" class="form-control form-control-user" placeholder="Responsable qualité" required>
-        <option value="" disabled selected>Choisir le Responsable qualité</option>
-        <option *ngFor="let rq of responsablesQualite" [value]="rq.nom">{{ rq.nom }}</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <input type="text" [(ngModel)]="nomC" name="nomC" class="form-control form-control-user" placeholder="Nom du client" required>
-    </div>
-    <button type="submit" class="btn btn-primary btn-user btn-block">Ajouter Projet</button>
-    <hr>
-  </form>
-</div>
-<h2>Liste des projets</h2>
-<table class="table">
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Description</th>
-      <th>Start Date</th>
-      <th>End Date</th>
-      <th>Methodology</th>
-      <th>Objectives</th>
-      <th>Type</th>
-      <th>Responsible Quality</th>
-      <th>Project Manager</th>
-      <th>Satisfaction Client</th>
+          <div class="form-group">
+            <label for="descriptionP">Description:</label>
+            <textarea id="descriptionP" [(ngModel)]="projetSelectionne.descriptionP" name="descriptionP" class="form-control"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="datedebutP">Date de début:</label>
+            <input type="date" id="datedebutP" [(ngModel)]="projetSelectionne.datedebutP" name="datedebutP" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="datefinP">Date de fin:</label>
+            <input type="date" id="datefinP" [(ngModel)]="projetSelectionne.datefinP" name="datefinP" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="methodologie">Méthodologie:</label>
+            <input type="text" id="methodologie" [(ngModel)]="projetSelectionne.methodologie" name="methodologie" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="objectifs">Objectifs:</label>
+            <textarea id="objectifs" [(ngModel)]="projetSelectionne.objectifs" name="objectifs" class="form-control"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="typeprojet">Type de projet:</label>
+            <select [(ngModel)]="projetSelectionne.typeprojet" name="typeprojet" class="form-control" id="typeprojet">
+              <option value="Produit">Produit</option>
+              <option value="Forfait">Forfait</option>
+              <option value="Régie">Régie</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="satisfactionClient">Indice de Satisfaction Client:</label>
+            <select [(ngModel)]="projetSelectionne.satisfactionClient" name="satisfactionClient" class="form-control" id="satisfactionClient">
+              <option value="SI1">SCI1</option>
+              <option value="SI2">SCI2</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="valeurSatisfaction">Valeur de Satisfaction Client:</label>
+            <input type="number" id="valeurSatisfaction" [(ngModel)]="projetSelectionne.valeurSatisfaction" name="valeurSatisfaction" class="form-control">
+          </div>
       
-      <th> Nombre de défaut Internes</th>
-      <th> Nombre de défaut Totaux</th>
-      <th> Nombre de Runs</th>
-      <th> Nombre de 8D Realisés</th>
-      <th> Nombre de Retours Critiques</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let projet of projets">
-      <td><a [routerLink]="['/projects', projet.idP, 'phases']">{{ projet.nomP }}</a></td>
-      <td>{{ projet.descriptionP }}</td>
-      <td>{{ projet.datedebutP | date }}</td>
-      <td>{{ projet.datefinP | date }}</td>
-      <td>{{ projet.methodologie }}</td>
-      <td>{{ projet.objectifs }}</td>
-      <td>{{ projet.typeprojet }}</td>
-      <td>{{ projet.responsableQualiteNom }}</td>
-      <td>{{ projet.chefDeProjetNom }}</td>
-      <td>{{ projet.satisfactionClient }}: {{ projet.valeurSatisfaction }}</td>
-      
-      <td>{{ projet.defautInternes}} </td>
-      <td>{{ projet.defautTotaux}} </td>
-       <td>{{ projet.nombreRuns}} </td>
-        <td>{{ projet.nbr8DRealises}} </td>
-          <td>{{ projet.nbrRetoursCritiques}} </td>
-          <td>
-            <button class="btn btn-outline-primary btn-sm" (click)="ouvrirModalModification(projet)">
-                <i class="fas fa-pen"></i>
-            </button>
-            <button class="btn btn-danger btn-sm" (click)="confirmerSuppression(projet)">
-                <i class="fas fa-trash"></i>
-            </button>
-          </td>
-    </tr>
-  </tbody>
-</table>
-</div>
-<div class="popup" *ngIf="showEditModal">
-    <div class="popup-content">
-      <div class="edit-modal">
-        <div class="modal-content">
-          <span class="close" (click)="fermerModal()" aria-label="Close">&times;</span>
-          
-          <form (ngSubmit)="modifierProjet()">
-            <h3>Modifier le Projet</h3>
-        
-            <div class="form-group">
-                <label for="nomP">Nom du projet:</label>
-                <input type="text" id="nomP" [(ngModel)]="projetSelectionne.nomP" name="nomP" class="form-control" required>
-            </div>
-        
-            <div class="form-group">
-                <label for="descriptionP">Description:</label>
-                <textarea id="descriptionP" [(ngModel)]="projetSelectionne.descriptionP" name="descriptionP" class="form-control"></textarea>
-            </div>
-        
-            <div class="form-group">
-                <label for="datedebutP">Date de début:</label>
-                <input type="date" id="datedebutP" [(ngModel)]="projetSelectionne.datedebutP" name="datedebutP" class="form-control">
-            </div>
-        
-            <div class="form-group">
-                <label for="datefinP">Date de fin:</label>
-                <input type="date" id="datefinP" [(ngModel)]="projetSelectionne.datefinP" name="datefinP" class="form-control">
-            </div>
-        
-            <div class="form-group">
-                <label for="methodologie">Méthodologie:</label>
-                <input type="text" id="methodologie" [(ngModel)]="projetSelectionne.methodologie" name="methodologie" class="form-control">
-            </div>
-        
-            <div class="form-group">
-                <label for="objectifs">Objectifs:</label>
-                <textarea id="objectifs" [(ngModel)]="projetSelectionne.objectifs" name="objectifs" class="form-control"></textarea>
-            </div>
-        
-            <div class="form-group">
-                <label for="typeprojet">Type de projet:</label>
-                <select [(ngModel)]="projetSelectionne.typeprojet" name="typeprojet" class="form-control" id="typeprojet">
-                    <option value="Produit">Produit</option>
-                    <option value="Forfait">Forfait</option>
-                    <option value="Régie">Régie</option>
-                </select>
-            </div>
-        
-            <div class="form-group">
-                <label for="satisfactionClient">Indice de Satisfaction Client:</label>
-                <select [(ngModel)]="projetSelectionne.satisfactionClient" name="satisfactionClient" class="form-control" id="satisfactionClient">
-                    <option value="SI1">SCI1</option>
-                    <option value="SI2">SCI2</option>
-                </select>
-            </div>
-        
-            <div class="form-group">
-                <label for="valeurSatisfaction">Valeur de Satisfaction Client:</label>
-                <input type="number" id="valeurSatisfaction" [(ngModel)]="projetSelectionne.valeurSatisfaction" name="valeurSatisfaction" class="form-control">
-            </div>
-        
+          <div class="form-group">
+            <label for="defautInternes">Nombre de défauts Internes:</label>
+            <input type="number" id="defautInternes" [(ngModel)]="projetSelectionne.defautInternes" name="defautInternes" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="defautTotaux">Nombre Total des défauts:</label>
+            <input type="number" id="defautTotaux" [(ngModel)]="projetSelectionne.defautTotaux" name="defautTotaux" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="nombreRuns">Nombre de Runs Hardware:</label>
+            <input type="number" id="nombreRuns" [(ngModel)]="projetSelectionne.nombreRuns" name="nombreRuns" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="nbr8DRealises">Nombre de 8D Realisés:</label>
+            <input type="number" id="nbr8DRealises" [(ngModel)]="projetSelectionne.nbr8DRealises" name="nbr8DRealises" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="nbrRetoursCritiques">Nombre de Retours Critiques:</label>
+            <input type="number" id="nbrRetoursCritiques" [(ngModel)]="projetSelectionne.nbrRetoursCritiques" name="nbrRetoursCritiques" class="form-control">
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="fermerModal()">Annuler</button>
             <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+          </div>
         </form>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+</div>
+<div class="overlay" *ngIf="showEditModal"></div>
   
   <div class="popup" *ngIf="showDeleteModal">
     <div class="popup-content">
@@ -385,5 +450,5 @@ h2.hovered {
         </div>
       </div>
     </div>
-  </div>
+  </div></div>
                     </div>
