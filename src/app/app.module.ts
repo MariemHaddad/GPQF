@@ -20,6 +20,7 @@ import { PhasesComponent } from './components/phases/phases.component';
 import { ChecklistsComponent } from './components/checklists/checklists.component';
 import { CausalAnalysisComponent } from './components/causal-analysis/causal-analysis.component';  // Ensure this path is correct
 import { CausalAnalysisService } from './services/causal-analysis.service';
+import { ResetPasswordComponent } from './components/auth/reset-password/reset-password.component';
 
 @NgModule({
   declarations: [
@@ -35,7 +36,8 @@ import { CausalAnalysisService } from './services/causal-analysis.service';
     ProjectsComponent,
     PhasesComponent,
     ChecklistsComponent,
-    CausalAnalysisComponent
+    CausalAnalysisComponent,
+    ResetPasswordComponent
   ],
   imports: [
     BrowserModule,

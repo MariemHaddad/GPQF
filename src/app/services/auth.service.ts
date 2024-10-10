@@ -73,15 +73,24 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
-
-
   forgotPassword(email: string): Observable<any> {
-    return this.http.post("http://localhost:8080/api/user/forgot-password", { email });
-  }
+    return this.http.post("http://localhost:8080/api/user/forgot-password", { email }, { responseType: 'text' });
+}
+getAllUsers(): Observable<any[]> { // Nouvelle méthode pour récupérer tous les utilisateurs
+  return this.http.get<any[]>(`http://localhost:8080/api/user/all-users`);
+}
   getPendingUsers(): Observable<any> {
     return this.http.get<any>('http://localhost:8080/api/authentication/pending-users');
   }
+  resetPassword(token: string, newPassword: string): Observable<any> {
+    const headers = new HttpHeaders({
+        'Authorization': `Bearer ${localStorage.getItem('token')}`, // Assurez-vous que ce token est correct
+        'Content-Type': 'application/json'
+    });
 
+    return this.http.post(`http://localhost:8080/api/user/reset-password`, { token, newPassword }, { headers, responseType: 'text'  });
+}
+  
   approveAccount(userId: number): Observable<any> {
     const headers = new HttpHeaders().set('Content-Type', 'application/json');
   const params = new HttpParams().set('idU', userId.toString()).set('status', 'APPROVED'); 

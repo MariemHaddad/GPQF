@@ -4,6 +4,12 @@
   max-width: 1200px; /* Limiter la largeur maximale */
   margin: 0 auto; /* Centrer le conteneur */
   padding: 0 15px; /* Ajouter un peu d'espace sur les côtés */
+}input[type="text"] {
+  margin: 10px 0;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 200px;
 }
 
 .table {
@@ -196,34 +202,57 @@ h2.hovered {
                       <div class="container-fluid">
                         <div *ngIf="selectedDashboard === 'Semestrielle'">
                           <h2>Taux des NCs interne et externe Semestrielle</h2>
+                          <label for="objectiveSemestrielle">Objectif :</label>
+                          <input type="text" [(ngModel)]="objectives.semestrielle" id="objectiveSemestrielle" (change)="updateObjective('Semestrielle', objectives.semestrielle)">
                           <canvas id="chartNCS"></canvas>
                         </div>
+                      
                         <div *ngIf="selectedDashboard === 'satisfaction'">
                           <h2>Satisfaction client</h2>
+                          <label for="objectiveSatisfaction">Objectif :</label>
+                          <input type="text" [(ngModel)]="objectives.satisfaction" id="objectiveSatisfaction" (change)="updateObjective('Satisfaction', objectives.satisfaction)">
                           <canvas id="chartSatisfaction"></canvas>
                         </div>
+                      
                         <div *ngIf="selectedDashboard === 'libération'">
                           <h2>Taux de libération</h2>
+                          <label for="objectiveLiberation">Objectif :</label>
+                          <input type="text" [(ngModel)]="objectives.liberation" id="objectiveLiberation" (change)="updateObjective('libération', objectives.liberation)">
                           <canvas id="chartTauxLiberation"></canvas>
                         </div>
-                        <div *ngIf="selectedDashboard === 'dde'">
-                          <h2>DDE par semestre</h2>
-                          <canvas id="chartDDE"></canvas>
-                        </div>
-                        <div *ngIf="selectedDashboard === 'hardware'">
-                          <h2>Nombre de Run Hardware</h2>
-                          <canvas id="chartNombreRun"></canvas>
-                        </div>
+                      
                         <div *ngIf="selectedDashboard === '8D'">
                           <h2>Taux de réalisation 8D</h2>
+                          <label for="objective8D">Objectif :</label>
+                          <input type="text" [(ngModel)]="objectives.taux8D" id="objective8D" (change)="updateObjective('8D', objectives.taux8D)">
                           <canvas id="chartTaux8D"></canvas>
                         </div>
+                      
+                        <div *ngIf="selectedDashboard === 'dde'">
+                          <h2>DDE par semestre</h2>
+                          <label for="objectiveDDE">Objectif :</label>
+                          <input type="text" [(ngModel)]="objectives.dde" id="objectiveDDE" (change)="updateObjective('dde', objectives.dde)">
+                          <canvas id="chartDDE"></canvas>
+                        </div>
+                      
+                        <div *ngIf="selectedDashboard === 'hardware'">
+                          <h2>Nombre de Run Hardware</h2>
+                          <label for="objectiveHardware">Objectif :</label>
+                          <input type="text" [(ngModel)]="objectives.hardware" id="objectiveHardware" (change)="updateObjective('hardware', objectives.hardware)">
+                          <canvas id="chartNombreRun"></canvas>
+                        </div>
+                      
                         <div *ngIf="selectedDashboard === 'Efficacitélibération'">
                           <h2>Efficacité de libération</h2>
+                          <label for="objectiveEfficaciteLiberation">Objectif :</label>
+                          <input type="text" [(ngModel)]="objectives.efficaciteLiberation" id="objectiveEfficaciteLiberation" (change)="updateObjective('Efficacitélibération', objectives.efficaciteLiberation)">
                           <canvas id="chartTauxConformite"></canvas>
                         </div>
+                      
                         <div *ngIf="selectedDashboard === 'Instantané'">
-                          <h2>Taux des NCs interne et externe Instantané </h2>
+                          <h2>Taux des NCs interne et externe Instantané</h2>
+                          <label for="objectiveInstantane">Modifier l'objectif :</label>
+                          <input type="text" [(ngModel)]="objectives.instantane" id="objectiveInstantane" (change)="updateObjective('Instantané', objectives.instantane)">
                           <canvas id="chartNC"></canvas>
                         </div>
                       </div>

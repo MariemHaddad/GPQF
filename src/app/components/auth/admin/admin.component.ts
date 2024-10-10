@@ -15,12 +15,19 @@ export class AdminComponent implements OnInit {
   activites: Activite[] = [];
   newActivite: Activite = new Activite(0, '');
   nouveauNom: string = '';
+  allUsers: any[] = []; 
   constructor(private authService: AuthService, private activiteService: ActiviteService) {}
 
   ngOnInit(): void {
     this.loggedInUsername = this.authService.getLoggedInUsername();
     this.loadPendingUsers();
     this.loadActivites();
+    this.loadAllUsers();
+  }
+  loadAllUsers(): void { // Nouvelle méthode pour charger tous les utilisateurs
+    this.authService.getAllUsers().subscribe((data: any[]) => {
+      this.allUsers = data;
+    });
   }
 
   loadPendingUsers(): void {

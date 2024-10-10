@@ -51,6 +51,16 @@ tauxLiberationData: { projet: string, taux: number }[] = [];
 courbeAffichee: string = '';
 private chartTauxLiberation: Chart | undefined;
 selectedDashboard: string = 'nc'; 
+  objectives = {
+    semestrielle: '',
+    satisfaction: '',
+    liberation: '',
+    dde: '',
+    hardware: '',
+    taux8D: '',
+    efficaciteLiberation: '',
+    instantane: ''
+  };
 
   constructor(
     private route: ActivatedRoute,
@@ -77,42 +87,86 @@ selectedDashboard: string = 'nc';
         const roleUtilisateur = localStorage.getItem('role');
         this.isDirecteur = roleUtilisateur === 'DIRECTEUR';
     }
-}
-afficherCourbe(courbe: string) {
-  this.courbeAffichee = courbe;
-}
-selectDashboard(dashboard: string): void {
-  this.selectedDashboard = dashboard;
-  switch (dashboard) {
-    case 'hardware':
-      this.loadNombreDeRunSemestriel();
-      break;
-    case 'dde':
-      this.loadDDEData();
-      break;
+    this.loadObjectivesFromLocalStorage();
+  }
+
+
+
+  // Method to update objectives
+  updateObjective(dashboard: string, objective: string): void {
+    // Check the dashboard string carefully for consistency
+    switch (dashboard) {
+      case 'Semestrielle':
+        this.objectives.semestrielle = objective;
+        break;
+      case 'Satisfaction':
+        this.objectives.satisfaction = objective;
+        break;
+      case 'libération':
+        this.objectives.liberation = objective;
+        break;
+      case '8D':
+        this.objectives.taux8D = objective;
+        break;
+      case 'dde':
+        this.objectives.dde = objective;
+        break;
+      case 'hardware':
+        this.objectives.hardware = objective;
+        break;
+      case 'Efficacitélibération':
+        this.objectives.efficaciteLiberation = objective;
+        break;
+      case 'Instantané':
+        this.objectives.instantane = objective;
+        break;
+    }
+    this.saveObjectivesToLocalStorage(); // Save updated objectives
+  }
+
+  // Save objectives to localStorage
+  saveObjectivesToLocalStorage(): void {
+    localStorage.setItem('dashboardObjectives', JSON.stringify(this.objectives));
+  }
+
+  // Load objectives from localStorage
+  loadObjectivesFromLocalStorage(): void {
+    const savedObjectives = localStorage.getItem('dashboardObjectives');
+    if (savedObjectives) {
+      this.objectives = JSON.parse(savedObjectives);
+    }
+  }
+
+  // Example of a method to change the dashboard
+  selectDashboard(dashboard: string): void {
+    this.selectedDashboard = dashboard;
+    switch (dashboard) {
+      case 'hardware':
+        this.loadNombreDeRunSemestriel();
+        break;
+      case 'dde':
+        this.loadDDEData();
+        break;
       case 'satisfaction':
         this.loadSatisfactionData();
         break;
-        case 'libération':
+      case 'libération':
         this.loadTauxLiberation();
         break;
-        case '8D':
+      case '8D':
         this.loadTaux8DSemestriels();
         break;
-        case 'Instantané':
-          this.loadTauxNCData();
-          break;
-          case 'Semestrielle':
-            this.loadTauxNCSemestriels();
-            break;
-            case 'Efficacitélibération':
-              this.loadTauxConformiteSemestriels();
-              break;
-            
-          
-    // Ajoutez d'autres cas si nécessaire
+      case 'Instantané':
+        this.loadTauxNCData();
+        break;
+      case 'Semestrielle':
+        this.loadTauxNCSemestriels();
+        break;
+      case 'Efficacitélibération':
+        this.loadTauxConformiteSemestriels();
+        break;
+    }
   }
-}
 openModal() {
   this.isModalOpen = true;
 }

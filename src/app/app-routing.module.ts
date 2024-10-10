@@ -9,6 +9,7 @@ import { ProjectsComponent } from './components/projects/projects.component';
 import { PhasesComponent } from './components/phases/phases.component';
 import { ChecklistsComponent } from './components/checklists/checklists.component';
 import { CausalAnalysisComponent } from './components/causal-analysis/causal-analysis.component';
+import { ResetPasswordComponent } from './components/auth/reset-password/reset-password.component';
 
 const routes: Routes = [
    // Redirection par défaut
@@ -16,7 +17,7 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'forgetpassword', component: ForgetpasswordComponent },
   { path: 'home', component: HomeComponent },
-
+  { path: 'reset-password', component: ResetPasswordComponent },
   { path: 'admin', component: AdminComponent },
   { path: 'projects', component: ProjectsComponent },
   { path: 'home/:activityId/projects', component: ProjectsComponent },
