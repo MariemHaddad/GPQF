@@ -1,5 +1,6 @@
 <body class="bg-gradient-primary">
   <div class="container custom-container">
+    <!-- Formulaire d'inscription -->
     <div class="card o-hidden border-0 shadow-lg my-5">
       <div class="card-body p-5">
         <div class="row justify-content-center">
@@ -11,18 +12,18 @@
               <form [formGroup]="registrationForm" (ngSubmit)="createaccount()">
                 <div class="form-group row">
                   <div class="col-sm-6 mb-3 mb-sm-0">
-                    <input formControlName="nom" class="form-control" id="name" placeholder="Enter Name" required>
+                    <input formControlName="nom" class="form-control" id="name" placeholder="Nom" required>
                   </div>
                   <div class="col-sm-6">
-                    <input formControlName="prenom" class="form-control" id="prenom" placeholder="Prenom" required>
+                    <input formControlName="prenom" class="form-control" id="prenom" placeholder="Prénom" required>
                   </div>
                 </div>
                 <div class="form-group">
-                  <input formControlName="email" class="form-control" id="email" placeholder="Enter Email" required>
+                  <input formControlName="email" class="form-control" id="email" placeholder="Adresse mail" required>
                 </div>
                 <div class="form-group row">
                   <div class="col-sm-6 mb-3 mb-sm-0">
-                    <input formControlName="password" type="password" class="form-control" id="motDePasse" placeholder="Enter Password" required>
+                    <input formControlName="password" type="password" class="form-control" id="motDePasse" placeholder="Mot de passe" required>
                   </div>
                   <div class="col-sm-6">
                     <select formControlName="role" class="form-control" id="role" required>
@@ -34,15 +35,15 @@
                     </select>
                   </div>
                 </div>
-                <button type="submit" class="btn btn-primary btn-user btn-block">Register Account</button>
+                <button type="submit" class="btn btn-primary btn-user btn-block">Inscription</button>
+                <div *ngIf="errorMessage" class="text-danger mt-2">{{ errorMessage }}</div>
                 <hr>
               </form>
-              <hr>
               <div class="text-center">
-                <a class="small" href="forgotpassword">Forgot Password?</a>
+                <a class="small" href="forgotpassword">Mot de passe oublié?</a>
               </div>
               <div class="text-center">
-                <a class="small" href="login">Already have an account? Login!</a>
+                <a class="small" href="login">Vous avez déjà un compte? Connectez-vous!</a>
               </div>
             </div>
           </div>
@@ -51,9 +52,69 @@
     </div>
   </div>
 
+  <div *ngIf="showModal" class="custom-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Veuillez attendre la confirmation de votre compte par mail !</h5>
+        </div>
+       
+        <div class="modal-footer">
+          <button class="btn btn-primary" (click)="redirectToLogin()">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Styles CSS personnalisés -->
   <style>
-    .custom-container {
-      margin-top: -150px;
+    .custom-modal {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1050;
+    }
+
+    .custom-modal .modal-dialog {
+      max-width: 500px;
+      margin: auto;
+    }
+
+    .custom-modal .modal-content {
+      background-color: #fff;
+      border-radius: 0.3rem;
+      box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+    }
+
+    .custom-modal .modal-header,
+    .custom-modal .modal-footer {
+      padding: 1rem;
+    }
+
+    .custom-modal .modal-title {
+      margin: 0;
+    }
+
+    .custom-modal .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .custom-modal .btn {
+      padding: 0.375rem 0.75rem;
+      font-size: 1rem;
+      border-radius: 0.25rem;
+    }
+
+    .custom-modal .btn-primary {
+      background-color: #007bff;
+      color: #fff;
     }
   </style>
 </body>

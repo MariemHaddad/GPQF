@@ -22,7 +22,15 @@ export class CausalAnalysisComponent implements OnInit {
   loading: boolean = false;
   planAction: PlanAction | undefined;
   editMode: boolean = false;
-
+  categoriesIshikawa: string[] = [
+    'MILIEU',
+    'MATIERE',
+    'MOYEN_MATERIEL',
+    'METHODE',
+    'MAIN_D_OEUVRE',
+    'MANAGEMENT',
+    'MOYENS_FINANCIERS'
+  ];
   constructor(
     private route: ActivatedRoute,
     private causalAnalysisService: CausalAnalysisService,
@@ -46,18 +54,22 @@ export class CausalAnalysisComponent implements OnInit {
 
   updateActionPlan() {
     if (this.planAction) {
-      this.causalAnalysisService.updatePlan(this.planAction).subscribe(
-        response => {
-          console.log('Plan d\'action mis à jour avec succès:', response);
-          this.loadActionPlan(); // Recharger les données après la mise à jour
-        },
-        error => {
-          console.error('Erreur lors de la mise à jour du plan d\'action:', error);
-        }
-      );
+        this.causalAnalysisService.updatePlan(this.planAction).subscribe(
+            response => {
+                console.log('Plan d\'action mis à jour avec succès:', response);
+                this.planAction = response; // Assurez-vous de mettre à jour le plan d'action avec la réponse
+                this.loadActionPlan(); // Recharger les données après la mise à jour
+            },
+            error => {
+                if (error.status === 403) {
+                    console.error('Accès refusé: vous n\'avez pas les autorisations nécessaires pour mettre à jour ce plan d\'action.');
+                } else {
+                    console.error('Erreur lors de la mise à jour du plan d\'action:', error);
+                }
+            }
+        );
     }
-  }
-
+}
   loadCausalAnalysis() {
     this.loading = true;
     if (this.checklistId !== undefined) {
@@ -84,18 +96,22 @@ export class CausalAnalysisComponent implements OnInit {
 
   loadActionPlan() {
     if (this.analyseCausale && this.analyseCausale.idAN) {
-      this.causalAnalysisService.getActionPlanByAnalysisId(this.analyseCausale.idAN).subscribe(
-        plan => {
-          this.planAction = plan;
-          this.editMode = false; // Désactiver le mode édition après avoir chargé les données
-          this.cdr.detectChanges();
-        },
-        error => {
-          console.error('Erreur lors du chargement du plan d\'action:', error);
-        }
-      );
+        this.causalAnalysisService.getActionPlanByAnalysisId(this.analyseCausale.idAN).subscribe(
+            plan => {
+                this.planAction = plan; // Assurez-vous que le plan d'action est correctement assigné
+                console.log('Plan d\'action chargé:', this.planAction); // Ajoutez un log ici
+                this.editMode = false; // Désactiver le mode édition après avoir chargé les données
+                this.cdr.detectChanges();
+            },
+            error => {
+                console.error('Erreur lors du chargement du plan d\'action:', error);
+            }
+        );
+    } else {
+        console.error('Analyse causale invalide:', this.analyseCausale);
     }
-  }
+}
+
 
   initializeAnalysis() {
     if (this.analyseCausale.methodeAnalyse === 'FIVE_WHYS') {
@@ -108,25 +124,19 @@ export class CausalAnalysisComponent implements OnInit {
       ];
     }
   }
-
   saveCausalAnalysis() {
     if (this.checklistId !== undefined) {
       this.causalAnalysisService.saveCausalAnalysis(this.analyseCausale, this.checklistId).subscribe(
         result => {
-          this.savedAnalyseCausale = result;
-  
-          // Assurez-vous de bien mettre à jour l'analyse causale avec les "5 Whys" sauvegardés
-          if (this.analyseCausale.methodeAnalyse === 'FIVE_WHYS') {
-            this.analyseCausale.cinqPourquoi = result.cinqPourquoi;
-          }
+          console.log('Réponse du serveur:', result);
+          this.savedAnalyseCausale = result; // Si vous avez besoin d'enregistrer le message
   
           // Créer le plan d'action après la sauvegarde de l'analyse causale
           console.log('Analyse Causale avant création du plan d\'action:', this.analyseCausale);
           this.createActionPlan(this.savedAnalyseCausale.idAN); 
   
-          // Charger le plan d'action pour vérifier les données
-          this.loadActionPlan();
-          this.cdr.detectChanges(); // Mise à jour de l'UI
+          // Rafraîchir la page pour afficher les nouvelles données
+          window.location.reload(); // Cela rafraîchira la page
         },
         error => {
           console.error('Erreur lors de la sauvegarde de l\'analyse causale:', error);
@@ -134,7 +144,6 @@ export class CausalAnalysisComponent implements OnInit {
       );
     }
   }
-
   createActionPlan(analyseCausaleId: number) {
     const planAction: PlanAction = new PlanAction();
     planAction.leconTirees = "Leçons tirées de l'analyse";

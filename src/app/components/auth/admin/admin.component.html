@@ -5,7 +5,8 @@
         .btn {
     font-size: 1.5rem; /* Ajustez la taille selon vos préférences */
 }
-    }</style>
+    }
+   </style>
     <div id="wrapper">
     
         <!-- Sidebar -->
@@ -146,13 +147,10 @@
                                                         <div class="h5 mb-0 font-weight-bold text-gray-800">{{ activite.nomA }}</div>
                                                     </div>
                                                     <div class="col-auto d-flex align-items-center">
-                                                        <!-- Emoji de la poubelle pour la suppression -->
-                                                        <button class="btn btn-danger mr-2" (click)="supprimerActivite(activite.idA)">
+                                                        <button class="btn btn-danger mr-2" (click)="openDeleteModal(activite)">
                                                             <i class="fas fa-trash"></i>
                                                         </button>
-                        
-                                                        <!-- Emoji du stylo pour la modification -->
-                                                        <button class="btn btn-primary" (click)="ouvrirFormulaireModification(activite)">
+                                                        <button class="btn btn-primary" (click)="openEditModalA(activite)">
                                                             &#9998; <!-- Emoji stylo -->
                                                         </button>
                                                     </div>
@@ -161,58 +159,131 @@
                                         </div>
                                     </div>
                                 </div>
+                                
+                                <!-- Modal de suppression -->
+                                <div class="modal" tabindex="-1" role="dialog" [ngClass]="{'show': isDeleteModalOpen}" [style.display]="isDeleteModalOpen ? 'block' : 'none'">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Supprimer l'activité</h5>
+                                                <button type="button" class="close" (click)="closeDeleteModal()">
+                                                    <span>&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Êtes-vous sûr de vouloir supprimer l'activité "{{ activiteToDelete?.nomA }}" ?</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" (click)="closeDeleteModal()">Annuler</button>
+                                                <button type="button" class="btn btn-danger" (click)="confirmSupprimerActivite()">Supprimer</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Modal de modification -->
+                                <div class="modal" [ngClass]="{'show': isEditModalAOpen}" [ngStyle]="{'display': isEditModalAOpen ? 'block' : 'none'}">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Modifier l'activité</h5>
+                                                <button type="button" class="close" aria-label="Close" (click)="closeEditModalA()">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form>
+                                                    <div class="form-group">
+                                                        <label for="nom">Nom</label>
+                                                        <div *ngIf="activiteToEdit">
+                                                            <input type="text" id="nom" [(ngModel)]="activiteToEdit.nomA" name="nom" class="form-control" required>
+                                                          </div>
+                                                    </div>
+                                                    <!-- Ajoutez d'autres champs si nécessaire -->
+                                                </form>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" (click)="closeEditModalA()">Annuler</button>
+                                                <button type="button" class="btn btn-primary" (click)="confirmUpdateActivite()">Mettre à jour</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="overlay" *ngIf="isEditModalOpen"></div>
+                                </div>
                         
-                            </div>
-                        
-                            <div class="row mt-4"> <!-- Ajout d'un espacement supérieur -->
-                                <div class="col-md-12"> <!-- Utilisez col-md-12 pour élargir -->
-                                    <h2>Liste des utilisateurs en attente</h2>
+                                <div class="row mt-4"> <!-- Ajout d'un espacement supérieur -->
+                                    <div class="col-md-12"> <!-- Utilisez col-md-12 pour élargir -->
+                                        <h2>Liste des utilisateurs en attente</h2>
+                                        <table class="table table-bordered" id="userTable" width="100%" cellspacing="0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Nom et Prénom</th>
+                                                    <th>Adresse mail</th>
+                                                    <th>Role</th>
+                                                    <th>Status de compte</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <!-- Boucle pour afficher les utilisateurs -->
+                                                <tr *ngFor="let user of pendingUsers">
+                                                    <td>{{ user.nom }} {{ user.prenom }}</td>
+                                                    <td>{{ user.email }}</td>
+                                                    <td>{{ getRoleLabel(user.role) }}</td>
+                                                    <td>
+                                                        <span [ngClass]="{
+                                                          'badge badge-warning': user.accountStatus === 'APPROVED',
+                                                          'badge badge-': user.accountStatus === 'PENDING',
+                                                          'badge badge-success': user.accountStatus === 'BLOCKED'
+                                                        }">
+                                                          {{ getAccountStatusLabel(user.accountStatus) }}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <button (click)="approveAccount(user.idU)" class="btn btn-success">Approuver</button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                    <h2>Tous les utilisateurs</h2>
                                     <table class="table table-bordered" id="userTable" width="100%" cellspacing="0">
                                         <thead>
                                             <tr>
-                                                <th>Name</th>
-                                                <th>Email</th>
+                                                <th>Nom et Prénom</th>
+                                                <th>Adresse mail</th>
                                                 <th>Role</th>
-                                                <th>Status</th>
-                                                <th>Action</th>
+                                                <th>Status de compte</th>
+                                                <th>Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <!-- Boucle pour afficher les utilisateurs -->
-                                            <tr *ngFor="let user of pendingUsers">
+                                            <tr *ngFor="let user of allUsers">
                                                 <td>{{ user.nom }} {{ user.prenom }}</td>
                                                 <td>{{ user.email }}</td>
-                                                <td>{{ user.role }}</td>
-                                                <td>{{ user.accountStatus }}</td>
+                                                <td>{{ getRoleLabel(user.role) }}</td>
                                                 <td>
-                                                    <button (click)="approveAccount(user.idU)" class="btn btn-success">Approuver</button>
+                                                    <span [ngClass]="{
+                                                      'badge badge-primary': user.accountStatus === 'APPROVED',
+                                                      'badge badge-warning': user.accountStatus === 'PENDING',
+                                                      'badge badge-danger': user.accountStatus === 'BLOCKED'
+                                                    }">
+                                                      {{ getAccountStatusLabel(user.accountStatus) }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <!-- Bouton de modification -->
+                                                    <button (click)="openEditModal(user)"  class="btn btn-success btn-sm" style="margin-right: 5px;">Modifier</button>
+                                                
+                                                    <!-- Bouton de suppression -->
+                                                    <button class="btn btn-danger btn-sm" (click)="openBlockModal(user.idU)">
+                                                        Bloquer
+                                                    </button>
                                                 </td>
                                             </tr>
                                         </tbody>
                                     </table>
-                                    <h2>Tous les utilisateurs</h2>
-    <table class="table table-bordered" id="userTable" width="100%" cellspacing="0">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Boucle pour afficher les utilisateurs -->
-            <tr *ngFor="let user of allUsers">
-                <td>{{ user.nom }} {{ user.prenom }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.role }}</td>
-                <td>{{ user.accountStatus }}</td>
-                
-            </tr>
-        </tbody>
-    </table>
-
                                 </div>
                             </div>
                         </div>
@@ -221,9 +292,77 @@
                     
       
                     <!-- Content Row -->
-                   
+                    <div class="modal" [ngClass]="{'show': isEditModalOpen}" [ngStyle]="{'display': isEditModalOpen ? 'block' : 'none'}">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Modifier l'utilisateur</h5>
+                                    <button type="button" class="close" aria-label="Close" (click)="closeEditModal()">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form>
+                                        <div class="form-group">
+                                            <label for="nom">Nom</label>
+                                            <input type="text" id="nom" [(ngModel)]="userToEdit.nom" name="nom" class="form-control" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="prenom">Prénom</label>
+                                            <input type="text" id="prenom" [(ngModel)]="userToEdit.prenom" name="prenom" class="form-control" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="email">Email</label>
+                                            <input type="email" id="email" [(ngModel)]="userToEdit.email" name="email" class="form-control" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="role">Role</label>
+                                            <select [(ngModel)]="userToEdit.role" name="role" class="form-control" required>
+                                                <option value="ADMIN">Admin</option>
+                                                <option value="DIRECTEUR">Directeur</option>
+                                                <option value="CHEFDEPROJET">Chef de projet</option>
+                                                <option value="RQUALITE">Responsable qualité</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="accountStatus">Statut de compte</label>
+                                            <select [(ngModel)]="userToEdit.accountStatus" name="accountStatus" class="form-control" required>
+                                                <option value="APPROVED">Approuvé</option>
+                                                <option value="PENDING">En Attente</option>
+                                                <option value="BLOCKED">Bloqué</option>
+                                            </select>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" (click)="closeEditModal()">Annuler</button>
+                                    <button type="button" class="btn btn-primary" (click)="confirmUpdateUser()">Mettre à jour</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="overlay" *ngIf="isEditModalOpen"></div>
+                    </div>
       
-                       
+                    <div class="modal" [ngClass]="{'show': isBlockModalOpen}" [ngStyle]="{'display': isBlockModalOpen ? 'block' : 'none'}">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Confirmation de Blocage</h5>
+                                    <button type="button" class="close" aria-label="Close" (click)="closeBlockModal()">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Êtes-vous sûr de vouloir bloquer cet utilisateur ? Il ne pourra plus se connecter.</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" (click)="closeBlockModal()">Annuler</button>
+                                    <button type="button" class="btn btn-warning" (click)="confirmBlockUser()">Bloquer</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="overlay" *ngIf="isBlockModalOpen"></div>
+                    </div>
                            
       <!-- Scroll to Top Button-->
       <a class="scroll-to-top rounded" href="#page-top">

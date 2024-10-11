@@ -13,8 +13,8 @@ export class CausalAnalysisService {
   constructor(private http: HttpClient) {}
 
   // Ajouter une analyse causale
-  saveCausalAnalysis(analysis: AnalyseCausale, checklistId: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}/add?checklistId=${checklistId}`, analysis);
+  saveCausalAnalysis(analysis: AnalyseCausale, checklistId: number): Observable<string> {
+    return this.http.post<string>(`${this.apiUrl}/add?checklistId=${checklistId}`, analysis, { responseType: 'text' as 'json' });
 }
 getActionPlanByAnalysisId(analyseCausaleId: number): Observable<PlanAction> {
   return this.http.get<PlanAction>(`http://localhost:8080/api/planAction/analyseCausale/${analyseCausaleId}/planAction`);
@@ -43,12 +43,15 @@ createActionPlan(planAction: PlanAction): Observable<PlanAction> {
   updatePlan(planAction: PlanAction): Observable<any> {
     console.log('Plan à mettre à jour:', planAction); // Log du plan d'action
     
-    // Vérifiez que les actions sont envoyées comme tableau
-    return this.http.put(`http://localhost:8080/api/planAction/actions/update/${planAction.idPa}`, planAction.actions, { responseType: 'text' })
+    return this.http.put(`http://localhost:8080/api/planAction/actions/update/${planAction.idPa}`, planAction.actions)
     .pipe(
         switchMap(() => 
-            this.http.put(`http://localhost:8080/api/planAction/update/${planAction.idPa}`, { leconTirees: planAction.leconTirees }, { responseType: 'text' })
-        )
+            this.http.put(`http://localhost:8080/api/planAction/update/${planAction.idPa}`, { leconTirees: planAction.leconTirees })
+        ),
+        catchError(error => {
+          console.error('Erreur lors de la mise à jour du plan d\'action:', error);
+          return throwError(error);
+      })
     );
-
-  }}
+}
+}

@@ -31,8 +31,15 @@ export class ChecklistService {
     return this.http.put(`${this.apiUrl}/updateItems/${checklistId}`, items);
   }
   updateChecklist(checklist: Checklist): Observable<any> {
-    console.log('Checklist à mettre à jour:', checklist); // Log the checklist data
+    console.log('Checklist à mettre à jour:', checklist);
+
+    // Prepare the data to be sent for status update
+    const statusPayload = {
+      status: checklist.status,
+      remarque: checklist.remarque
+    };
+
     return this.http.put(`${this.apiUrl}/updateItems/${checklist.idCh}`, checklist.items, { responseType: 'text' }).pipe(
-      switchMap(() => this.http.put(`${this.apiUrl}/updateStatus/${checklist.idCh}`, { status: checklist.status, remarque: checklist.remarque }, { responseType: 'text' }))
+      switchMap(() => this.http.put(`${this.apiUrl}/updateStatus/${checklist.idCh}`, statusPayload, { responseType: 'text' }))
     );
-  }}
+}}

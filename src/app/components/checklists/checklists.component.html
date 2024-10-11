@@ -129,16 +129,28 @@
     </div>
   
     <!-- Boutons Modifier et Enregistrer les modifications -->
-    <div *ngIf="isRQualite">
-      <button type="submit" class="btn btn-primary btn-user btn-block" *ngIf="isEditing" (click)="saveChecklist()">Enregistrer les modifications</button>
+    <!-- Votre bouton pour enregistrer les modifications -->
+<div *ngIf="isRQualite">
+  <button type="submit" class="btn btn-primary btn-user btn-block" *ngIf="isEditing" (click)="saveChecklist()">Enregistrer les modifications</button>
+</div>
+
+<div class="modal" [ngClass]="{'show': isCausalAnalysisModalOpen}" [ngStyle]="{'display': isCausalAnalysisModalOpen ? 'block' : 'none'}">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Analyse Causale Nécessaire</h5>
+        <button type="button" class="close" aria-label="Close" (click)="closeCausalAnalysisModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Vous devez remplir une analyse causale pour définir la raison de refus de la checklist. Voulez-vous continuer ?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeCausalAnalysisModal()">Annuler</button>
+        <button type="button" class="btn btn-primary" (click)="navigateToCausalAnalysis()">Continuer</button>
+      </div>
     </div>
   </div>
-  <script>
-    function handleRefusedStatus() {
-      if (this.checklist.status === 'REFUSE') {
-        if (confirm('Vous devez remplir une analyse causale pour définir la raison de refus de la checklist. Voulez-vous continuer ?')) {
-          this.router.navigate(['/causal-analysis'], { queryParams: { checklistId: this.checklist.idCh } });
-        }
-      }
-    }
-  </script>
+  <div class="overlay" *ngIf="isCausalAnalysisModalOpen"></div>
+</div>

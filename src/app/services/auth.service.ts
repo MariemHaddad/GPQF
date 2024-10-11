@@ -72,6 +72,12 @@ export class AuthService {
     localStorage.removeItem('token');
     this.router.navigate(['/login']);
   }
+  blockUser(idU: number): Observable<void> {
+    return this.http.put<void>(`http://localhost:8080/api/user/block/${idU}`, {});
+  }
+  updateUser(id: number, updatedUser: any): Observable<any> {
+    return this.http.put<any>(`http://localhost:8080/api/user/update/${id}`, updatedUser);
+  }
 
   forgotPassword(email: string): Observable<any> {
     return this.http.post("http://localhost:8080/api/user/forgot-password", { email }, { responseType: 'text' });
@@ -91,11 +97,15 @@ getAllUsers(): Observable<any[]> { // Nouvelle méthode pour récupérer tous le
     return this.http.post(`http://localhost:8080/api/user/reset-password`, { token, newPassword }, { headers, responseType: 'text'  });
 }
   
-  approveAccount(userId: number): Observable<any> {
-    const headers = new HttpHeaders().set('Content-Type', 'application/json');
-  const params = new HttpParams().set('idU', userId.toString()).set('status', 'APPROVED'); 
-    return this.http.post<any>('http://localhost:8080/api/authentication/change-account-status', {}, { headers, params });
-  }
+approveAccount(userId: number): Observable<any> {
+  const headers = new HttpHeaders().set('Content-Type', 'application/json');
+
+
+  const params = new HttpParams()
+  .set('idU', userId.toString())
+  .set('status', 'APPROVED');
+
+return this.http.post<any>('http://localhost:8080/api/authentication/change-account-status', {}, { headers, params });}
   hasRole(role: string): boolean {
     const token = this.getFromLocalStorage(this.tokenKey);
     if (!token) {

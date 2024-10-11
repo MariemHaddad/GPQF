@@ -23,35 +23,38 @@ export class LoginComponent implements OnInit {Form: FormGroup;
 
   ngOnInit(): void {}
 
-  login() {
+ login() {
     if (this.Form.invalid) {
-      console.log('Form is invalid');
-      this.displayValidationErrors();
-      return;
+        console.log('Form is invalid');
+        this.displayValidationErrors();
+        return;
     }
 
     console.log('Form values:', this.Form.value);
 
     this.authService.authenticate(this.Form.value.email, this.Form.value.password).subscribe({
-      next: (data: { token: string; refreshToken: string; id: string; role: string }) => {
-        this.authService.setToLocalStorage("token", data.token);
-        this.authService.setToLocalStorage("refreshToken", data.refreshToken);
-        this.authService.setToLocalStorage("id", data.id);
-        this.authService.setToLocalStorage("role", data.role);
-    
-        if (data.role === 'ADMIN') {
-          this.router.navigate(['/admin']);
-        } else {
-          this.router.navigate(['/home']);
-        }
-      },
-      error: (err: { status: number }) => {
-        if (err.status === 401) {
-          this.message = 'Bad Credential';
-        }
+        next: (data: { token: string; refreshToken: string; id: string; role: string }) => {
+            this.authService.setToLocalStorage("token", data.token);
+            this.authService.setToLocalStorage("refreshToken", data.refreshToken);
+            this.authService.setToLocalStorage("id", data.id);
+            this.authService.setToLocalStorage("role", data.role);
+
+            if (data.role === 'ADMIN') {
+                this.router.navigate(['/admin']);
+            } else {
+                this.router.navigate(['/home']);
+            }
+        },
+        error: (err: any) => {
+          // Vérifiez si le corps de la réponse contient un message d'erreur
+          if (err.error && err.error.message) {
+              this.errorMessage = err.error.message; // Récupération du message d'erreur
+          } else {
+              this.errorMessage = 'An unexpected error occurred. Please try again later.';
+          }
       }
     });
-  }
+}
 
   displayValidationErrors() {
     for (const key in this.Form.controls) {
