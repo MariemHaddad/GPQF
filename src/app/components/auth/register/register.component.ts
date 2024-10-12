@@ -14,6 +14,7 @@ export class RegisterComponent implements OnInit {
   message!:string;
   showModal: boolean = false;
   errorMessage: string = '';  
+  loading: boolean = false;
   constructor(
     private formBuilder: FormBuilder,
     private auth: AuthService,

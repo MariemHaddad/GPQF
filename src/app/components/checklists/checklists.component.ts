@@ -21,6 +21,11 @@ export class ChecklistsComponent implements OnInit {
     remarque: '',
     items: []  // Initialize checklist items as an empty array
   };
+  resultatItem : string[] = [
+    "OK",
+    "NOK",
+    "NA"
+  ];
 
   statusOptions: string[] = ['EN_ATTENTE', 'ACCEPTE', 'REFUSE'];  // Available status options
   isCausalAnalysisModalOpen: boolean = false; // Modal state for causal analysis
