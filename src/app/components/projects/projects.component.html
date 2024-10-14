@@ -1,21 +1,12 @@
 
 <style>
- .container {
-  max-width: 1200px; /* Limiter la largeur maximale */
-  margin: 0 auto; /* Centrer le conteneur */
-  padding: 0 15px; /* Ajouter un peu d'espace sur les côtés */
-}input[type="text"] {
+
+input[type="text"] {
   margin: 10px 0;
   padding: 5px;
   border: 1px solid #ccc;
   border-radius: 4px;
   width: 200px;
-}
-
-.table {
-  margin-top: 20px;
-  margin-left: auto; /* Centrer la table horizontalement */
-  margin-right: auto; /* Centrer la table horizontalement */
 }
 .text-center {
   text-align: center;
@@ -78,12 +69,68 @@
 h2.hovered {
   text-decoration: underline; /* Souligne le texte lorsque la classe hovered est appliquée */
 }
+form.user {
+  position: relative; /* S'assurer qu'il est bien positionné */
+  z-index: 10; /* Ajuster le z-index pour qu'il soit au-dessus des autres éléments */
+  margin: 20px auto; /* Centrer le formulaire sur la page */
+  padding: 20px;
+  background-color: white; /* Assurez-vous qu'il a un fond visible */
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  width: 100%; /* Ajustez la largeur pour qu'elle corresponde à la taille du conteneur */
+  max-width: 500px; /* Limitez la largeur maximale pour éviter un formulaire trop large */
+}body {
+  margin: 0; /* Réinitialiser les marges du corps */
+  font-family: Arial, sans-serif; /* Choisissez une police */
+}
+#wrapper {
+  display: flex; /* Utiliser flexbox pour aligner le contenu */
+  width: 100%; /* S'assurer que le wrapper prend toute la largeur */
+}
+.table-container {
+  overflow-x: auto; /* Permet le défilement horizontal */
+  white-space: nowrap; /* Empêche le retour à la ligne dans les cellules */
+}
+
+.table {
+  width: 100%; /* Pour s'assurer que le tableau prend toute la largeur du conteneur */
+}
+
+.table th,
+.table td {
+  max-width: 150px; /* Ajustez cette valeur selon vos besoins */
+  overflow: hidden; /* Masque le contenu qui dépasse */
+  text-overflow: ellipsis; /* Affiche '...' pour le texte qui dépasse */
+  white-space: nowrap; /* Empêche le texte de passer à la ligne suivante */
+}
+
+/* Ajustez le style de la sidebar si elle chevauche le tableau */
+.sidebar {
+  width: 250px; /* Largeur de la barre latérale */
+}
+
+#content {
+  padding: 20px; /* Ajoutez un espacement interne */
+  overflow: auto; /* Permettre le défilement vertical */
+}
+
+#content-wrapper {
+  flex: 1; /* Prendre tout l'espace disponible */
+  overflow: hidden; /* Empêche le débordement */
+}
+
+
+
+.container {
+  max-width: 1200px; /* Limiter la largeur maximale */
+  margin: 0 auto; /* Centrer le conteneur */
+  padding: 0px; /* Ajouter un peu d'espace sur les côtés */
+}
     </style>
-     <div id="wrapper">
+  <div id="wrapper">
+    <!-- Sidebar -->
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
   
-      <!-- Sidebar -->
-      <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-    
           <!-- Sidebar - Brand -->
           <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
               <div class="sidebar-brand-icon rotate-n-15">
@@ -171,35 +218,32 @@ h2.hovered {
                 <span>Mot de passe oublié ?</span></a>
         </li>
            
-        </ul>
+      </ul>
        
               <!-- Content Wrapper -->
-      <div id="content-wrapper" class="d-flex flex-column">
-      
-        <div id="content">
-  
-            <!-- Topbar -->
-            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-  
-                <!-- Sidebar Toggle (Topbar) -->
-                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                    <i class="fa fa-bars"></i>
-                </button>
-                <div class="container custom-container">
-                <!-- Topbar Search -->
-                <div class="text-left">
-                    <img src="assets/img/Telnet.png" alt="Telnet Logo" class="center" style="width: 200px; height: auto;">
-                  </div>
-                </div>
-              
-            </nav>
-            <div class="container">
-              <div class="row justify-content-center">
-                <div class="col-md-14"> <!-- Centrez le contenu en utilisant une colonne -->
-                  <div class="app-container" [ngClass]="{'hidden': showEditModal}">
-                    <div class="main-interface">
-                      <!-- Begin Page Content -->
-                      <div class="container-fluid">
+              <div id="content-wrapper" class="d-flex flex-column">
+                <div id="content">
+                  <!-- Topbar -->
+                  <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                      <i class="fa fa-bars"></i>
+                    </button>
+                    <div class="container custom-container">
+                      <!-- Topbar Search -->
+                      <div class="text-left">
+                        <img src="assets/img/Telnet.png" alt="Telnet Logo" class="center" style="width: 200px; height: auto;">
+                      </div>
+                    </div>
+                  </nav>
+            
+                  <div class="container">
+                    <div class="row justify-content-center">
+                      <div class="col-md-12"> <!-- Centrez le contenu en utilisant une colonne -->
+                        <div class="app-container" [ngClass]="{'hidden': showEditModal}">
+                          <div class="main-interface">
+                            <!-- Begin Page Content -->
+                            <div class="container-fluid">
                         <div *ngIf="selectedDashboard === 'Semestrielle'">
                           <h2>Taux des NCs interne et externe Semestrielle</h2>
                           <label for="objectiveSemestrielle">Objectif :</label>
@@ -288,27 +332,41 @@ h2.hovered {
                             <textarea [(ngModel)]="nouveauProjet.objectifs" name="objectifs" class="form-control form-control-user" placeholder="Objectifs" required></textarea>
                           </div>
                           <div class="form-group">
+                            <label for="typeprojet">Type de projet</label>
                             <select [(ngModel)]="nouveauProjet.typeprojet" name="typeprojet" class="form-control form-control-user" placeholder="Type de projet" required>
-                              <option value="" disabled selected>Type de projet</option>
+                              <option value="" disabled >Type de projet</option>
                               <option value="Produit">Produit</option>
                               <option value="Forfait">Forfait</option>
                               <option value="Régie">Régie</option>
                             </select>
+                            <p>Type de projet sélectionné : {{ nouveauProjet.typeprojet }}</p>
                           </div>
                           <div class="form-group" *ngIf="isDirecteur">
-                            <select [(ngModel)]="chefDeProjetNom" name="chefDeProjetNom" class="form-control form-control-user" placeholder="Chef de projet" required>
-                              <option value="" disabled selected>Choisir le Chef de projet</option>
+                            <label for="chefDeProjetNom">Chef de Projet</label>
+                            <select [(ngModel)]="chefDeProjetNom" name="chefDeProjetNom" class="form-control form-control-user" required>
+                              <option value="" disabled>Choisir le Chef de projet</option>
                               <option *ngFor="let chef of chefsDeProjet" [value]="chef.nom">{{ chef.nom }}</option>
                             </select>
+                            <!-- Affichage du chef de projet sélectionné -->
+                            <p>Chef de projet sélectionné : {{ chefDeProjetNom }}</p>
                           </div>
                           <div class="form-group">
+                            <label for="responsableQualiteNom">Responsable Qualite</label>
                             <select [(ngModel)]="responsableQualiteNom" name="responsableQualiteNom" class="form-control form-control-user" placeholder="Responsable qualité" required>
-                              <option value="" disabled selected>Choisir le Responsable qualité</option>
+                              <option value="" disabled>Choisir le Responsable Qualité</option>
                               <option *ngFor="let rq of responsablesQualite" [value]="rq.nom">{{ rq.nom }}</option>
+                            </select>
+                            <p>Responsable Qualite sélectionné : {{ responsableQualiteNom }}</p>
+                          </div>
+                          <div class="form-group">
+                            <label for="nomC">Client</label>
+                            <select [(ngModel)]="nomC" name="nomC" class="form-control form-control-user">
+                              <option value="" disabled selected>Choisir un client existant</option>
+                              <option *ngFor="let client of clients" [value]="client.nomC">{{ client.nomC }}</option>
                             </select>
                           </div>
                           <div class="form-group">
-                            <input type="text" [(ngModel)]="nomC" name="nomC" class="form-control form-control-user" placeholder="Nom du client" required>
+                            <input type="text" [(ngModel)]="nomC" name="nomC" class="form-control form-control-user" placeholder="Ou entrer un nouveau client">
                           </div>
                           <button type="submit" class="btn btn-primary btn-user btn-block">Ajouter Projet</button>
                           <hr>
@@ -316,7 +374,12 @@ h2.hovered {
                       </div>
             
                       <h2>Liste des projets</h2>
-                      <table class="table">
+                      <div class="container">
+                        <div class="row justify-content-center">
+                          <div class="col-md-12"> <!-- Changer la taille de la colonne ici -->
+                            <div class="app-container">
+                              <div class="table-container"> <!-- Conteneur de table pour le défilement -->
+                                <table class="table">
                         <thead>
                           <tr>
                             <th>Nom</th>
@@ -365,6 +428,7 @@ h2.hovered {
                           </tr>
                         </tbody>
                       </table>
+                      </div>
                     </div>
                   </div>
             

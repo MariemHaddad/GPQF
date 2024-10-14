@@ -11,6 +11,7 @@ import { TauxNCSemestrielResponse } from 'src/app/modules/taux-nc-semestriel-res
 import { SatisfactionDataDTO } from 'src/app/modules/satisfaction-data.model';
 import { DDEDataDTO } from 'src/app/modules/dde-data-dto';
 import { NombreDeRunSemestrielResponse } from 'src/app/modules/nombre-de-run-semestriel-response.model';
+import { Client } from 'src/app/modules/client';
 
 @Component({
   selector: 'app-projects',
@@ -61,7 +62,7 @@ selectedDashboard: string = 'nc';
     efficaciteLiberation: '',
     instantane: ''
   };
-
+  clients: Client[] = []; 
   constructor(
     private route: ActivatedRoute,
     private router: Router, // Ajoutez Router au constructeur
@@ -76,6 +77,7 @@ selectedDashboard: string = 'nc';
         this.loadProjets();
         this.loadChefsDeProjet();
         this.loadResponsablesQualite();
+        this.loadClients();
         this.loadTauxNCData(); 
         this.loadTauxNCSemestriels(); 
         this.loadSatisfactionData(); // Chargez les données pour le graphique ici
@@ -248,91 +250,95 @@ createTauxLiberationChart(): void {
       },
     },
   });
-}
-loadTauxConformiteSemestriels(): void {
+}loadTauxConformiteSemestriels(): void {
   this.projetService.getTauxCBySemestre(this.activiteId).subscribe((data: { [key: string]: number[] }) => {
-    const semestres: string[] = [];
-    const tauxConformite: number[] = [];
+      console.log('Données récupérées:', data);
 
-    // Parcourez les entrées de l'objet et construisez les tableaux
-    for (const [semestre, taux] of Object.entries(data)) {
-      semestres.push(semestre);
-      tauxConformite.push(...taux); // Récupérez les valeurs du tableau
-    }
+      const semestres: string[] = [];
+      const tauxConformite: number[] = [];
 
-    // Modifiez la structure pour correspondre à la définition attendue
-    this.tauxConformiteSemestriels = semestres.map((semestre, index) => ({
-      semestre,
-      taux: tauxConformite[index], // Utilisez le taux correspondant
-    }));
+      // Parcourez les entrées de l'objet et construisez les tableaux
+      for (const [semestre, taux] of Object.entries(data)) {
+          semestres.push(semestre);
+          tauxConformite.push(taux[0] || 0); // Assurez-vous de prendre le premier taux
+      }
 
-    // Ajoutez le console.log ici
-    console.log('Taux de conformité semestriels avant tri:', this.tauxConformiteSemestriels);
+      console.log('Semestres:', semestres);
+      console.log('Taux de conformité avant traitement:', tauxConformite); // Ajoutez ceci
 
-    this.createTauxConformiteChart(); // Créez le graphique après avoir chargé les données
+      // Modifiez la structure pour correspondre à la définition attendue
+      this.tauxConformiteSemestriels = semestres.map((semestre, index) => ({
+          semestre,
+          taux: tauxConformite[index] || 0, // Utilisez le bon taux ici
+      }));
+
+      console.log('Taux de conformité semestriels après traitement:', this.tauxConformiteSemestriels); // Ajoutez ceci
+
+      this.createTauxConformiteChart(); // Créez le graphique après avoir chargé les données
   });
 }
-
 createTauxConformiteChart(): void {
   // Trier les semestres par ordre croissant
   this.tauxConformiteSemestriels.sort((a, b) => {
-    // On suppose que le format des semestres est "S1-AAAA" ou "S2-AAAA"
-    const [sA, anA] = a.semestre.split('-');
-    const [sB, anB] = b.semestre.split('-');
+      const [sA, anA] = a.semestre.split('-');
+      const [sB, anB] = b.semestre.split('-');
 
-    const anComparison = Number(anA) - Number(anB);
-    if (anComparison !== 0) {
-      return anComparison; // Compare les années d'abord
-    }
+      const anComparison = Number(anA) - Number(anB);
+      if (anComparison !== 0) {
+          return anComparison; // Compare les années d'abord
+      }
 
-    // Comparer les semestres, en considérant S1 avant S2
-    return Number(sA[1]) - Number(sB[1]);
+      return Number(sA[1]) - Number(sB[1]); // Comparer les semestres
   });
 
   // Obtenir les semestres et les taux triés
   const semestres = this.tauxConformiteSemestriels.map((item) => item.semestre);
   const tauxConformite = this.tauxConformiteSemestriels.map((item) => item.taux);
 
+  console.log('Semestres triés:', semestres); // Ajoutez ceci
+  console.log('Taux de conformité triés:', tauxConformite); // Ajoutez ceci
+
   // Détruire le graphique précédent s'il existe
   if (this.chartTauxConformite) {
-    this.chartTauxConformite.destroy();
+      this.chartTauxConformite.destroy();
   }
 
   // Créer le graphique avec Chart.js
   this.chartTauxConformite = new Chart('chartTauxConformite', {
-    type: 'line', // Type de graphique
-    data: {
-      labels: semestres,
-      datasets: [
-        {
-          label: 'Taux de conformité',
-          data: tauxConformite,
-          borderColor: 'rgba(75, 192, 192, 1)',
-          backgroundColor: 'rgba(75, 192, 192, 0.2)',
-          fill: true,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      scales: {
-        y: {
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: 'Taux de Conformité (%)',
-          },
-        },
-        x: {
-          title: {
-            display: true,
-            text: 'Semestres',
-          },
-        },
+      type: 'line', // Type de graphique
+      data: {
+          labels: semestres,
+          datasets: [
+              {
+                  label: 'Taux de conformité',
+                  data: tauxConformite,
+                  borderColor: 'rgba(75, 192, 192, 1)',
+                  backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                  fill: true,
+              },
+          ],
       },
-    },
+      options: {
+          responsive: true,
+          scales: {
+              y: {
+                  beginAtZero: true,
+                  title: {
+                      display: true,
+                      text: 'Taux de Conformité (%)',
+                  },
+              },
+              x: {
+                  title: {
+                      display: true,
+                      text: 'Semestres',
+                  },
+              },
+          },
+      },
   });
 }
+
 loadTaux8DSemestriels(): void {
   this.projetService.getTauxRealisation8DSemestriel(this.activiteId).subscribe((data: { [key: string]: number[] }) => {
     this.taux8DSemestriels = data;
@@ -771,7 +777,19 @@ loadResponsablesQualite(): void {
     this.responsablesQualite = data;
   });
 }
+loadClients(): void {
+  this.projetService.getClients().subscribe((data: Client[]) => {
+    this.clients = data;
+  });
+}onChefDeProjetChange(event: Event): void {
+  const target = event.target as HTMLSelectElement;
+  this.chefDeProjetNom = target.value; // No more TypeScript error
+}
 
+onResponsableQualiteChange(event: Event): void {
+  const target = event.target as HTMLSelectElement;
+  this.responsableQualiteNom = target.value; // No more TypeScript error
+}
 
 
 ajouterProjet(): void {

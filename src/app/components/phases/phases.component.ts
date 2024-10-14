@@ -42,13 +42,15 @@ export class PhasesComponent implements OnInit {
   chartExternal: any;
   VALID_PHASE_NAMES = [
     "La conception préliminaire",
-    "La conception détaillée",
-    "La mise en œuvre",
-    "La vérification",
-    "La validation",
+    "Conception détaillée",
+    "Manuel d'utilisation",
+    "Tests unitaires",
+    "Le Plan d'Integration",
     "Code",
     "Spécification",
-    "Livraison"
+    "Livraison",
+    "Le Plan de Validation",
+    "Le Plan de Management (PM)"
   ];
 
   nouvellePhase: any = {

@@ -2,6 +2,22 @@
   body {
     padding: 0 20px; /* Add padding to the left and right of the page */
   }
+  .remarque-textarea {
+  width: 100%;
+  min-height: 100px; /* Hauteur minimale plus grande */
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical; /* Autorise le redimensionnement vertical */
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+.remarque-textarea:focus {
+  border-color: #66afe9;
+  outline: none;
+  box-shadow: 0 0 8px rgba(102, 175, 233, 0.6);
+}
 
   .analyse-container {
     padding: 20px;
@@ -300,6 +316,6 @@
     </table>
  
         <label for="leconTirees">Leçons Apprises:</label>
-        <input id="leconTirees" [(ngModel)]="planAction.leconTirees" [attr.readonly]="!editMode || !isRqualite ? true : null">
+        <input class="remarque-textarea" id="leconTirees" [(ngModel)]="planAction.leconTirees" [attr.readonly]="!editMode || !isRqualite ? true : null">
       </div>
     </div>

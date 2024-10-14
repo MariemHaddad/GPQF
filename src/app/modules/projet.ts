@@ -1,3 +1,5 @@
+import { Client } from "./client";
+
 export class Projet {
     nomP: string;
     idP: number;
@@ -9,6 +11,7 @@ export class Projet {
     typeprojet: string;
     responsableQualiteNom: string;
     chefDeProjetNom: string;
+    client?: Client;
     satisfactionClient?: string; // Add this property if necessary
     valeurSatisfaction?: number; 
     defautInternes ?: number; // DI
@@ -16,6 +19,7 @@ export class Projet {
     nombreRuns?:number;
     nbr8DRealises?: number;
     nbrRetoursCritiques?: number;
+   
     constructor(
         nomP: string = '',
         idP: number = 0,
@@ -27,6 +31,7 @@ export class Projet {
         typeprojet: string = '',
         responsableQualiteNom: string = '',
         chefDeProjetNom: string= '',
+        client?: Client,
         satisfactionClient: string = '', // Add this to the constructor
         valeurSatisfaction: number = 0 ,
         defautInternes :number = 0, // DI
@@ -46,6 +51,7 @@ export class Projet {
         this.typeprojet = typeprojet;
         this.chefDeProjetNom= chefDeProjetNom;
         this.responsableQualiteNom= responsableQualiteNom;
+        this.client = client;
         this.satisfactionClient = satisfactionClient; // Initialize
         this.valeurSatisfaction = valeurSatisfaction;
         this.defautInternes = defautInternes;

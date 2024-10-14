@@ -8,6 +8,7 @@ import { TauxNCSemestrielResponse } from '../modules/taux-nc-semestriel-response
 import { SatisfactionDataDTO } from '../modules/satisfaction-data.model';
 import { DDEDataDTO } from '../modules/dde-data-dto';
 import { NombreDeRunSemestrielResponse } from '../modules/nombre-de-run-semestriel-response.model';
+import { Client } from '../modules/client';
 
 @Injectable({
   providedIn: 'root'
@@ -23,6 +24,9 @@ export class ProjetService {  private baseUrl = 'http://localhost:8080/api/proje
 
   getResponsablesQualite(): Observable<User[]> {
     return this.http.get<User[]>(`${this.baseUrl}/responsablesqualite`);
+  }
+  getClients(): Observable<Client[]> {
+    return this.http.get<Client[]>(`${this.baseUrl}/all`);
   }
 
   getProjetsByActivite(activiteId: number): Observable<Projet[]> {
