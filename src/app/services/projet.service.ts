@@ -53,6 +53,35 @@ export class ProjetService {  private baseUrl = 'http://localhost:8080/api/proje
   
     return this.http.post(`${this.baseUrl}/ajouter`, projet, options);
   }
+  getAllProjets(): Observable<Projet[]> {
+    return this.http.get<Projet[]>(`${this.baseUrl}/all/projets`);
+}
+
+getProjectStatus(): Observable<{ enCours: number; termines: number; enAttente: number }> {
+    return this.getAllProjets().pipe(
+        map((projets: Projet[]) => {
+            const aujourdhui = new Date();
+            let enCours = 0;
+            let termines = 0;
+            let enAttente = 0;
+
+            projets.forEach(projet => {
+                const dateFin = new Date(projet.datefinP);
+                const dateDebut = new Date(projet.datedebutP);
+
+                if (dateFin < aujourdhui) {
+                    termines++;
+                } else if (dateDebut <= aujourdhui && dateFin >= aujourdhui) {
+                    enCours++;
+                } else {
+                    enAttente++;
+                }
+            });
+
+            return { enCours, termines, enAttente };
+        })
+    );
+}
   getTauxNCData(activiteId: number): Observable<TauxNCData[]> {
     return this.http.get<TauxNCData[]>(`${this.baseUrl}/activite/${activiteId}/tauxNC`);
 }
@@ -82,8 +111,8 @@ getNombreDeRunParSemestre(activiteId: number) {
 getTauxRealisation8DSemestriel(activiteId: number): Observable<{ [key: string]: number[] }> {
   return this.http.get<{ [key: string]: number[] }>(`${this.baseUrl}/tauxRealisation8D/${activiteId}`);
 }
-getTauxCBySemestre(activiteId: number): Observable<{ [key: string]: number[] }> {
-  return this.http.get<{ [key: string]: number[] }>(`${this.baseUrl}/activite/${activiteId}/tauxC`);
+getTauxCBySemestre(activiteId: number): Observable<{ [key: string]: number }> {
+  return this.http.get<{ [key: string]: number }>(`${this.baseUrl}/activite/${activiteId}/tauxC`);
 }
 getTauxLiberation(activiteId: number): Observable<{ projet: string, taux: number }[]> {
   return this.http.get<{ [key: string]: number }>(`${this.baseUrl}/activites/${activiteId}/taux-liberation-semestriel`).pipe(

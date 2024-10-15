@@ -1,44 +1,109 @@
+<head>
+  <!-- Importer la police Poppins depuis Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    .bg-gradient-primary {
+      background: linear-gradient(to bottom, rgba(0, 51, 102, 0.8), rgba(0, 51, 102, 0.9)); /* Bleu marine avec transparence */
+      color: #d1d3e2;
+    }
 
-<style>
-.navbar-dropdown-item {
-    margin-right: 100px; /* Ajustez la valeur selon vos besoins */
-}.text-left img {
-    margin-left: -100px; /* Ajustez la valeur pour déplacer le logo */
-}</style>
- <div id="wrapper">
-  
+    .navbar-dropdown-item {
+      margin-right: 100px; /* Ajustez la valeur selon vos besoins */
+    }
+
+    .btn {
+      font-size: 1.5rem; /* Ajustez la taille selon vos préférences */
+    }
+
+    /* Style commun à tous les éléments du menu */
+    .sidebar .nav-link,
+    .sidebar .sidebar-brand-text {
+      font-family: 'Poppins', sans-serif; /* Police moderne Poppins */
+      font-size: 15px; /* Taille de texte plus fine et moderne */
+      font-weight: 400; /* Poids léger pour un design épuré */
+      color: #d1d3e2; /* Couleur gris clair élégante */
+      transition: color 0.3s ease; /* Transition fluide pour les effets de survol */
+    }
+
+    /* Effet de survol moderne avec soulignement fin */
+    .sidebar .nav-link:hover {
+      color: #ffffff; /* Changement de couleur au survol */
+      text-decoration: underline; /* Soulignement subtil au survol */
+      text-underline-offset: 4px; /* Ajuster l'espace du soulignement par rapport au texte */
+    }
+
+    /* Style particulier pour le lien "Activités" (modifié) */
+    .sidebar .nav-item.activites .nav-link span {
+      font-weight: 600; /* Mettre en évidence l'élément actif */
+      /* Couleur dorée pour l'élément "Activités" */
+      font-size: 18px; /* Augmenter la taille du texte */
+      letter-spacing: 1px; /* Espacement entre les lettres */
+      text-transform: uppercase; /* Mettre le texte en majuscules */
+    }
+    .chart-container {
+  display: flex; /* Utilise le flexbox */
+  justify-content: center; /* Centre horizontalement */
+  align-items: center; /* Centre verticalement */
+  width: 100%; /* Utilise toute la largeur du conteneur parent */
+  height: 300px; /* Ajustez cette valeur pour le conteneur */
+  overflow: hidden; /* Empêche le débordement */
+}
+
+.my-chart {
+  width: 300px !important; /* Taille du graphique */
+  height: 300px !important; /* Taille du graphique */
+}
+
+    /* Effet de survol sur le fond du menu */
+    .sidebar:hover {
+      background: linear-gradient(to bottom, rgba(0, 51, 102, 0.9), rgba(0, 51, 102, 1)); /* Légère variation de transparence au survol */
+    }
+  </style>
+</head>
+
+<body>
+  <div id="wrapper">
     <!-- Sidebar -->
     <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-  
-        <!-- Sidebar - Brand -->
-        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
-            <div class="sidebar-brand-icon rotate-n-15">
-            </div>
-            <div class="sidebar-brand-text mx-3">Menu</div>
+
+      <!-- Sidebar - Brand -->
+      <a class="sidebar-brand d-flex align-items-center justify-content-center">
+        <div class="sidebar-brand-text mx-3">Menu</div>
+      </a>
+
+      <!-- Divider -->
+      <hr class="sidebar-divider my-0">
+
+ 
+
+    
+
+      <!-- Nav Item - Déconnexion -->
+      <li class="nav-item activites">
+        <a class="nav-link">
+          <span>Activités</span>
         </a>
-  
-        <!-- Divider -->
-        <hr class="sidebar-divider my-0">
-  
-        <li class="nav-item active">
-            <a class="nav-link" href="index.html">
-        
-               
-                <span >Activités</span>
-            </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="login">
-              <i class="fas fa-fw fa-table"></i>
-              <span>Déconnexion</span></a>
       </li>
+
+      <!-- Nav Item - Déconnexion -->
+      <li class="nav-item">
+        <a class="nav-link" href="login">
+          <i class="fas fa-fw fa-sign-out-alt"></i>
+          <span>Déconnexion</span>
+        </a>
+      </li>
+
+      <!-- Nav Item - Mot de passe oublié -->
       <li class="nav-item">
         <a class="nav-link" href="forgetpassword">
-            <i class="fas fa-fw fa-table"></i>
-            <span>Mot de passe oublié ?</span></a>
-    </li>
-          
+          <i class="fas fa-fw fa-key"></i>
+          <span>Mot de passe oublié ?</span>
+        </a>
+      </li>
+
     </ul>
+
+
   
     <!-- Content Wrapper -->
     <div id="content-wrapper" class="d-flex flex-column">
@@ -64,8 +129,12 @@
   
             <!-- Begin Page Content -->
             <div class="container-fluid">
-  
-                
+              <div>
+                <h2>Statut des Projets</h2>
+                <div class="chart-container">
+                  <canvas #myChartRef class="my-chart"></canvas>
+                </div>
+              </div>
                 <h2>Liste des Activités</h2>
                 <div class="row">
                   <div class="col-xl-4 col-md-6 mb-4" *ngFor="let activite of activites">

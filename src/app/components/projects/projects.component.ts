@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ActiviteService } from 'src/app/services/activite.service';
 import { ProjetService } from 'src/app/services/projet.service';
@@ -92,6 +92,84 @@ selectedDashboard: string = 'nc';
     this.loadObjectivesFromLocalStorage();
   }
 
+ 
+
+  loadTauxNCSemestriels(): void {
+    const activiteId = this.activiteId; // Utilisez l'ID d'activité existant
+    this.projetService.getTauxNCSemestriels(activiteId).subscribe((data: TauxNCSemestrielResponse[]) => {
+      this.tauxNCSemestriels = data; // Stockez les données semestrielles
+      this.createSemestrialChart(); // Créez le graphique après avoir chargé les données
+    });
+  }  createSemestrialChart(): void {
+    // Obtenir les semestres et les taux
+    const semestres = this.tauxNCSemestriels.map((item) => item.semestre);
+    const tauxNCInterne = this.tauxNCSemestriels.map((item) => item.tauxNCInterne);
+    const tauxNCExterne = this.tauxNCSemestriels.map((item) => item.tauxNCExterne);
+  
+    // Créer un tableau d'objets pour le tri
+    const semestresTriees = semestres.map((semestre, index) => ({
+        semestre,
+        tauxNCInterne: tauxNCInterne[index],
+        tauxNCExterne: tauxNCExterne[index]
+    })).sort((a, b) => {
+        const [y1, s1] = a.semestre.split('-'); // Sépare par '-' (année, semestre)
+        const [y2, s2] = b.semestre.split('-'); // Sépare par '-' (année, semestre)
+  
+        // Comparaison des années
+        const yearComparison = parseInt(y1) - parseInt(y2);
+        if (yearComparison !== 0) return yearComparison; // Retourne la différence si les années sont différentes
+  
+        // Comparaison des semestres
+        const semestre1 = parseInt(s1.replace('S', '')); // Convertir S1/S2 en nombre
+        const semestre2 = parseInt(s2.replace('S', ''));
+        return semestre1 - semestre2; // Trier par semestre
+    });
+  
+    // Debug: Vérifier l'ordre des semestres après tri
+    console.log('Semestres triés:', semestresTriees);
+  
+    // Extraire les données triées
+    const labels = semestresTriees.map(item => item.semestre);
+    const tauxNCInterneTrie = semestresTriees.map(item => item.tauxNCInterne);
+    const tauxNCExterneTrie = semestresTriees.map(item => item.tauxNCExterne);
+  
+    // Détruire le graphique précédent s'il existe
+    if (this.chartNCS) {
+        this.chartNCS.destroy();
+    }
+  
+    // Créer le graphique avec Chart.js
+    this.chartNCS = new Chart('chartNCS', {
+        type: 'line', // Type de graphique
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Taux NC Interne',
+                    data: tauxNCInterneTrie,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: true,
+                },
+                {
+                    label: 'Taux NC Externe',
+                    data: tauxNCExterneTrie,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    fill: true,
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                },
+            },
+        },
+    });
+  }
 
 
   // Method to update objectives
@@ -250,8 +328,9 @@ createTauxLiberationChart(): void {
       },
     },
   });
-}loadTauxConformiteSemestriels(): void {
-  this.projetService.getTauxCBySemestre(this.activiteId).subscribe((data: { [key: string]: number[] }) => {
+}
+loadTauxConformiteSemestriels(): void {
+  this.projetService.getTauxCBySemestre(this.activiteId).subscribe((data: { [key: string]: number }) => {
       console.log('Données récupérées:', data);
 
       const semestres: string[] = [];
@@ -260,23 +339,22 @@ createTauxLiberationChart(): void {
       // Parcourez les entrées de l'objet et construisez les tableaux
       for (const [semestre, taux] of Object.entries(data)) {
           semestres.push(semestre);
-          tauxConformite.push(taux[0] || 0); // Assurez-vous de prendre le premier taux
+          tauxConformite.push(taux || 0); // Assurez-vous de prendre le taux unique
       }
 
       console.log('Semestres:', semestres);
-      console.log('Taux de conformité avant traitement:', tauxConformite); // Ajoutez ceci
+      console.log('Taux de conformité avant traitement:', tauxConformite);
 
-      // Modifiez la structure pour correspondre à la définition attendue
       this.tauxConformiteSemestriels = semestres.map((semestre, index) => ({
           semestre,
           taux: tauxConformite[index] || 0, // Utilisez le bon taux ici
       }));
 
-      console.log('Taux de conformité semestriels après traitement:', this.tauxConformiteSemestriels); // Ajoutez ceci
-
       this.createTauxConformiteChart(); // Créez le graphique après avoir chargé les données
   });
 }
+
+
 createTauxConformiteChart(): void {
   // Trier les semestres par ordre croissant
   this.tauxConformiteSemestriels.sort((a, b) => {
@@ -396,82 +474,7 @@ createTaux8DSemestrielChart(): void {
     },
   });
 }
-loadTauxNCSemestriels(): void {
-  const activiteId = this.activiteId; // Utilisez l'ID d'activité existant
-  this.projetService.getTauxNCSemestriels(activiteId).subscribe((data: TauxNCSemestrielResponse[]) => {
-    this.tauxNCSemestriels = data; // Stockez les données semestrielles
-    this.createSemestrialChart(); // Créez le graphique après avoir chargé les données
-  });
-}  createSemestrialChart(): void {
-  // Obtenir les semestres et les taux
-  const semestres = this.tauxNCSemestriels.map((item) => item.semestre);
-  const tauxNCInterne = this.tauxNCSemestriels.map((item) => item.tauxNCInterne);
-  const tauxNCExterne = this.tauxNCSemestriels.map((item) => item.tauxNCExterne);
 
-  // Créer un tableau d'objets pour le tri
-  const semestresTriees = semestres.map((semestre, index) => ({
-      semestre,
-      tauxNCInterne: tauxNCInterne[index],
-      tauxNCExterne: tauxNCExterne[index]
-  })).sort((a, b) => {
-      const [y1, s1] = a.semestre.split('-'); // Sépare par '-' (année, semestre)
-      const [y2, s2] = b.semestre.split('-'); // Sépare par '-' (année, semestre)
-
-      // Comparaison des années
-      const yearComparison = parseInt(y1) - parseInt(y2);
-      if (yearComparison !== 0) return yearComparison; // Retourne la différence si les années sont différentes
-
-      // Comparaison des semestres
-      const semestre1 = parseInt(s1.replace('S', '')); // Convertir S1/S2 en nombre
-      const semestre2 = parseInt(s2.replace('S', ''));
-      return semestre1 - semestre2; // Trier par semestre
-  });
-
-  // Debug: Vérifier l'ordre des semestres après tri
-  console.log('Semestres triés:', semestresTriees);
-
-  // Extraire les données triées
-  const labels = semestresTriees.map(item => item.semestre);
-  const tauxNCInterneTrie = semestresTriees.map(item => item.tauxNCInterne);
-  const tauxNCExterneTrie = semestresTriees.map(item => item.tauxNCExterne);
-
-  // Détruire le graphique précédent s'il existe
-  if (this.chartNCS) {
-      this.chartNCS.destroy();
-  }
-
-  // Créer le graphique avec Chart.js
-  this.chartNCS = new Chart('chartNCS', {
-      type: 'line', // Type de graphique
-      data: {
-          labels: labels,
-          datasets: [
-              {
-                  label: 'Taux NC Interne',
-                  data: tauxNCInterneTrie,
-                  borderColor: 'rgba(75, 192, 192, 1)',
-                  backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                  fill: true,
-              },
-              {
-                  label: 'Taux NC Externe',
-                  data: tauxNCExterneTrie,
-                  borderColor: 'rgba(255, 99, 132, 1)',
-                  backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                  fill: true,
-              },
-          ],
-      },
-      options: {
-          responsive: true,
-          scales: {
-              y: {
-                  beginAtZero: true,
-              },
-          },
-      },
-  });
-}
 
 
 

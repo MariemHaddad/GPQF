@@ -1,3 +1,6 @@
+<head>
+  <!-- Importer la police Poppins depuis Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
   
@@ -59,7 +62,50 @@ thead {
 h2.hovered {
 text-decoration: underline; /* Souligne le texte lorsque la classe hovered est appliquée */
 }
+.bg-gradient-primary {
+      background: linear-gradient(to bottom, rgba(0, 51, 102, 0.8), rgba(0, 51, 102, 0.9)); /* Bleu marine avec transparence */
+      color: #d1d3e2;
+    }
+
+    .navbar-dropdown-item {
+      margin-right: 100px; /* Ajustez la valeur selon vos besoins */
+    }
+
+    
+    /* Style commun à tous les éléments du menu */
+    .sidebar .nav-link,
+    .sidebar .sidebar-brand-text {
+      font-family: 'Poppins', sans-serif; /* Police moderne Poppins */
+      font-size: 15px; /* Taille de texte plus fine et moderne */
+      font-weight: 400; /* Poids léger pour un design épuré */
+      color: #d1d3e2; /* Couleur gris clair élégante */
+      transition: color 0.3s ease; /* Transition fluide pour les effets de survol */
+    }
+
+    /* Effet de survol moderne avec soulignement fin */
+    .sidebar .nav-link:hover {
+      color: #ffffff; /* Changement de couleur au survol */
+      text-decoration: underline; /* Soulignement subtil au survol */
+      text-underline-offset: 4px; /* Ajuster l'espace du soulignement par rapport au texte */
+    }
+
+    /* Style particulier pour le lien "Activités" (modifié) */
+    .sidebar .nav-item.activites .nav-link span {
+      font-weight: 600; /* Mettre en évidence l'élément actif */
+      /* Couleur dorée pour l'élément "Activités" */
+      font-size: 18px; /* Augmenter la taille du texte */
+      letter-spacing: 1px; /* Espacement entre les lettres */
+      text-transform: uppercase; /* Mettre le texte en majuscules */
+    }
+
+    /* Effet de survol sur le fond du menu */
+    .sidebar:hover {
+      background: linear-gradient(to bottom, rgba(0, 51, 102, 0.9), rgba(0, 51, 102, 1)); /* Légère variation de transparence au survol */
+    }
   </style>
+</head>
+
+
   <div id="wrapper">
   
       <!-- Sidebar -->
@@ -74,9 +120,8 @@ text-decoration: underline; /* Souligne le texte lorsque la classe hovered est a
     
           <!-- Divider -->
           <hr class="sidebar-divider my-0">
-    
-          <li class="nav-item active">
-              <a class="nav-link" href="index.html">
+          <li class="nav-item activites">
+            <a class="nav-link">
           
                  
                   <span >Phases</span>
@@ -84,12 +129,12 @@ text-decoration: underline; /* Souligne le texte lorsque la classe hovered est a
           </li>
           <li class="nav-item">
             <a class="nav-link" href="login">
-                <i class="fas fa-fw fa-table"></i>
+              <i class="fas fa-fw fa-sign-out-alt"></i>
                 <span>Déconnexion</span></a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="forgetpassword">
-              <i class="fas fa-fw fa-table"></i>
+            <i class="fas fa-fw fa-key"></i>
               <span>Mot de passe oublié ?</span></a>
       </li>
             
